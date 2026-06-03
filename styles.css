@@ -552,7 +552,8 @@ h3 {
 .link-list a {
   color: var(--acid);
   font-weight: 800;
-  overflow-wrap: anywhere;
+  overflow-wrap: normal;
+  word-break: normal;
 }
 
 .resume-main > section {
