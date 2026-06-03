@@ -109,8 +109,13 @@ a {
 }
 
 .site-nav a:hover::after,
-.site-nav a:focus-visible::after {
+.site-nav a:focus-visible::after,
+.site-nav a.is-active::after {
   transform: scaleX(1);
+}
+
+.site-nav a.is-active {
+  color: #fff;
 }
 
 .nav-toggle {
@@ -271,6 +276,33 @@ a {
   padding: clamp(72px, 9vw, 118px) clamp(18px, 4vw, 56px);
 }
 
+.page-hero {
+  padding: 142px clamp(18px, 4vw, 56px) clamp(70px, 8vw, 104px);
+  border-bottom: 1px solid var(--line);
+  background:
+    linear-gradient(135deg, rgba(12, 39, 23, 0.78), rgba(7, 10, 12, 0.96) 52%),
+    var(--bg);
+}
+
+.page-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(300px, 0.95fr);
+  gap: clamp(28px, 7vw, 82px);
+  align-items: end;
+}
+
+.page-hero h1 {
+  margin: 0;
+  font-size: 4.4rem;
+  line-height: 0.96;
+}
+
+.page-hero p:not(.eyebrow) {
+  margin: 0;
+  color: rgba(244, 255, 248, 0.78);
+  font-size: 1.1rem;
+}
+
 .section {
   background: var(--bg);
 }
@@ -312,12 +344,17 @@ h3 {
 
 .intro-grid,
 .about-grid,
+.split-panel,
 .experience-grid,
 .contact-inner {
   display: grid;
   grid-template-columns: minmax(0, 0.95fr) minmax(280px, 1fr);
   gap: clamp(30px, 7vw, 84px);
   align-items: start;
+}
+
+.compact-actions {
+  margin-top: 24px;
 }
 
 .intro-list {
@@ -402,6 +439,136 @@ h3 {
   font-weight: 900;
 }
 
+.compact-grid .project-card {
+  min-height: 230px;
+}
+
+.case-stack {
+  display: grid;
+  gap: 18px;
+}
+
+.case-study {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr);
+  gap: 22px;
+  padding: 26px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(17, 26, 31, 0.96), rgba(10, 15, 18, 0.98)),
+    var(--panel);
+  box-shadow: 0 16px 42px rgba(0, 0, 0, 0.24);
+}
+
+.accent-case {
+  border-color: rgba(156, 255, 49, 0.32);
+  background:
+    linear-gradient(180deg, rgba(156, 255, 49, 0.13), rgba(10, 15, 18, 0.98)),
+    var(--panel-strong);
+}
+
+.case-marker {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border: 1px solid rgba(156, 255, 49, 0.36);
+  border-radius: 8px;
+  color: var(--acid);
+  font-weight: 900;
+}
+
+.case-body h2 {
+  margin: 12px 0 0;
+}
+
+.case-body > p {
+  max-width: 850px;
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: 1.05rem;
+}
+
+.detail-grid,
+.skill-matrix {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 22px;
+}
+
+.detail-grid div,
+.skill-matrix article {
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(7, 10, 12, 0.46);
+}
+
+.detail-grid p,
+.skill-matrix p,
+.resume-sidebar p,
+.resume-main p {
+  margin: 10px 0 0;
+  color: var(--muted);
+}
+
+.skill-matrix {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.resume-grid {
+  display: grid;
+  grid-template-columns: minmax(240px, 0.35fr) minmax(0, 1fr);
+  gap: clamp(28px, 6vw, 76px);
+  align-items: start;
+}
+
+.resume-sidebar {
+  position: sticky;
+  top: 110px;
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(17, 26, 31, 0.78);
+}
+
+.resume-sidebar h2 {
+  font-size: 1.7rem;
+}
+
+.link-list,
+.resume-main {
+  display: grid;
+  gap: 24px;
+}
+
+.link-list {
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.link-list a {
+  color: var(--acid);
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.resume-main > section {
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--line);
+}
+
+.resume-main > section:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.compact-matrix {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .about-copy {
   font-size: 1.08rem;
 }
@@ -461,6 +628,10 @@ h3 {
     linear-gradient(135deg, rgba(12, 39, 23, 0.96), rgba(5, 8, 10, 0.98)),
     var(--panel);
   color: #fff;
+}
+
+.contact-page {
+  min-height: calc(100vh - 325px);
 }
 
 .contact .section-kicker {
@@ -578,14 +749,29 @@ h3 {
 
   .intro-grid,
   .about-grid,
+  .split-panel,
   .experience-grid,
   .contact-inner,
-  .project-grid {
+  .project-grid,
+  .page-hero-grid,
+  .detail-grid,
+  .skill-matrix,
+  .resume-grid,
+  .compact-matrix {
     grid-template-columns: 1fr;
   }
 
-  .sticky-heading {
+  .sticky-heading,
+  .resume-sidebar {
     position: static;
+  }
+
+  .page-hero h1 {
+    font-size: 3.25rem;
+  }
+
+  .case-study {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -625,5 +811,17 @@ h3 {
   .timeline-item {
     grid-template-columns: 1fr;
     gap: 8px;
+  }
+
+  .page-hero {
+    padding-top: 118px;
+  }
+
+  .page-hero h1 {
+    font-size: 2.75rem;
+  }
+
+  .case-study {
+    padding: 20px;
   }
 }

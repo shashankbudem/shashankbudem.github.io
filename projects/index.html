@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Projects | Budem Shashank</title>
+    <meta
+      name="description"
+      content="AI and full-stack project case studies by Budem Shashank, including MCP servers, RAG pipelines, fintech platforms, and ML research."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../styles.css" />
+  </head>
+  <body>
+    <header class="site-header is-scrolled" data-header>
+      <a class="brand" href="../index.html" aria-label="Budem Shashank home">
+        <span class="brand-mark">SB</span>
+        <span>Budem Shashank</span>
+      </a>
+      <button class="nav-toggle" type="button" aria-label="Open navigation" aria-expanded="false" data-nav-toggle>
+        <i data-lucide="menu"></i>
+      </button>
+      <nav class="site-nav" data-nav>
+        <a href="../index.html">Home</a>
+        <a class="is-active" href="./">Projects</a>
+        <a href="../experience/">Experience</a>
+        <a href="../resume/">Resume</a>
+        <a href="../contact/">Contact</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="page-hero">
+        <div class="section-inner page-hero-grid">
+          <div>
+            <p class="eyebrow">Projects</p>
+            <h1>Case studies for AI systems that meet enterprise constraints.</h1>
+          </div>
+          <p>
+            These are the projects that best explain my AI-role positioning: model-facing tools, retrieval systems, secure backend
+            services, and full-stack fintech platforms.
+          </p>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-inner case-stack">
+          <article class="case-study" id="enterprise-data-chatbot">
+            <div class="case-marker">01</div>
+            <div class="case-body">
+              <div class="project-meta">
+                <span>GenAI</span>
+                <span>MCP Server</span>
+              </div>
+              <h2>Enterprise Data Chatbot</h2>
+              <p>
+                Built an LLM chatbot integrating Open WebUI with enterprise data through a custom Python MCP server. The system
+                exposed tools for dynamic table discovery, field lookup, choice-value resolution, and schema-aware query generation.
+              </p>
+              <div class="detail-grid">
+                <div>
+                  <h3>Problem</h3>
+                  <p>Users needed natural-language access to operational data without giving the model unsafe execution power.</p>
+                </div>
+                <div>
+                  <h3>What I Built</h3>
+                  <p>Replaced arbitrary script execution with a structured JSON query interpreter supporting filters, aggregates, and dot-walking.</p>
+                </div>
+                <div>
+                  <h3>Security</h3>
+                  <p>Implemented per-user OAuth 2.0 flows through Microsoft Entra ID so API access stayed tied to user identity.</p>
+                </div>
+              </div>
+              <div class="cert-list">
+                <span>Python</span>
+                <span>FastMCP</span>
+                <span>Open WebUI</span>
+                <span>OAuth2</span>
+                <span>Schema-aware tools</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="case-study accent-case" id="policy-retrieval-system">
+            <div class="case-marker">02</div>
+            <div class="case-body">
+              <div class="project-meta">
+                <span>RAG</span>
+                <span>Hybrid Search</span>
+              </div>
+              <h2>Policy Retrieval System</h2>
+              <p>
+                Built a retrieval pipeline for policy and knowledge content using Elasticsearch BM25, vector embeddings, document
+                parsing, chunking, and user-level access validation.
+              </p>
+              <div class="detail-grid">
+                <div>
+                  <h3>Retrieval</h3>
+                  <p>Combined lexical search and embeddings to make document lookup more precise for enterprise knowledge use cases.</p>
+                </div>
+                <div>
+                  <h3>Ingestion</h3>
+                  <p>Used a Docling-based document parsing flow to transform source files into searchable chunks.</p>
+                </div>
+                <div>
+                  <h3>Deployment</h3>
+                  <p>Containerized the MCP server, Elasticsearch, and ingestion workers with Docker Compose.</p>
+                </div>
+              </div>
+              <div class="cert-list">
+                <span>RAG</span>
+                <span>Elasticsearch</span>
+                <span>Vector embeddings</span>
+                <span>Docker Compose</span>
+                <span>Access control</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="case-study" id="tprm-platform">
+            <div class="case-marker">03</div>
+            <div class="case-body">
+              <div class="project-meta">
+                <span>FinTech</span>
+                <span>Full-Stack</span>
+              </div>
+              <h2>TPRM Platform</h2>
+              <p>
+                Built a vendor lifecycle management platform covering pre-onboarding, vendor onboarding, risk assessment, due
+                diligence, annual performance review, and regulatory data protection requirements.
+              </p>
+              <div class="detail-grid">
+                <div>
+                  <h3>Architecture</h3>
+                  <p>Spring Boot, Angular, MongoDB, Temporal workflows, authorization, and Kafka notification pipelines.</p>
+                </div>
+                <div>
+                  <h3>Integrations</h3>
+                  <p>Connected third-party screening services through OAuth2 client credentials via the enterprise auth gateway.</p>
+                </div>
+                <div>
+                  <h3>Compliance</h3>
+                  <p>Led PII encryption work including Aadhaar vault handling and PAN masking for sensitive data protection.</p>
+                </div>
+              </div>
+              <div class="cert-list">
+                <span>Spring Boot</span>
+                <span>Angular</span>
+                <span>MongoDB</span>
+                <span>Temporal</span>
+                <span>Kafka</span>
+                <span>OAuth2</span>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section-band">
+        <div class="section-inner">
+          <div class="section-heading">
+            <p class="section-kicker">Academic ML</p>
+            <h2>Research and applied machine learning foundations.</h2>
+          </div>
+          <div class="project-grid compact-grid">
+            <article class="project-card">
+              <h3>Website Phishing Detection</h3>
+              <p>ML classification model for detecting phishing vs. legitimate websites using URL and page features.</p>
+              <a href="https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3853016">
+                <span>View paper</span>
+                <i data-lucide="arrow-up-right"></i>
+              </a>
+            </article>
+            <article class="project-card">
+              <h3>Person Detection & Tracking</h3>
+              <p>Computer vision pipeline with OpenCV for detecting and tracking people in video feeds.</p>
+            </article>
+            <article class="project-card">
+              <h3>Traffic Sign Detection</h3>
+              <p>CNN-based image classifier for autonomous driving and traffic monitoring scenarios.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span data-year></span> Budem Shashank. Built for the internet.</p>
+      <a href="./" aria-label="Back to top">
+        <i data-lucide="arrow-up"></i>
+      </a>
+    </footer>
+
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <script src="../script.js"></script>
+  </body>
+</html>
