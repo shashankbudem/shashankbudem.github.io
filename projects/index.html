@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="../styles.css" />
@@ -20,7 +20,7 @@
     <header class="site-header is-scrolled" data-header>
       <a class="brand" href="../index.html" aria-label="Budem Shashank home">
         <span class="brand-mark">SB</span>
-        <span>Budem Shashank</span>
+        <span>Budem Shashank <small>/ SYSTEMS</small></span>
       </a>
       <button class="nav-toggle" type="button" aria-label="Open navigation" aria-expanded="false" data-nav-toggle>
         <i data-lucide="menu"></i>
@@ -38,18 +38,49 @@
       <section class="page-hero">
         <div class="section-inner page-hero-grid">
           <div>
-            <p class="eyebrow">Projects</p>
-            <h1>Case studies for AI systems that meet enterprise constraints.</h1>
+            <p class="eyebrow">System Registry / Projects</p>
+            <h1>Agents, retrieval, and platforms built under real constraints.</h1>
           </div>
           <p>
-            These are the projects that best explain my AI-role positioning: model-facing tools, retrieval systems, secure backend
-            services, and full-stack fintech platforms.
+            A technical record of model-facing tools, retrieval systems, secure backend services, and full-stack fintech platforms.
           </p>
         </div>
       </section>
 
       <section class="section">
         <div class="section-inner case-stack">
+          <article class="case-study active-case" id="coding-agent">
+            <div class="case-marker">00</div>
+            <div class="case-body">
+              <div class="project-meta">
+                <span>Active Build</span>
+                <span>Coding Agent</span>
+              </div>
+              <h2>Coding Agent Workbench</h2>
+              <p>
+                A repository-aware assistant designed to inspect context, plan scoped changes, call tools, edit code, run checks,
+                and report what changed with a traceable execution loop.
+              </p>
+              <div class="detail-grid">
+                <div>
+                  <h3>Context</h3>
+                  <p>Reads repository structure and relevant files before proposing a change.</p>
+                </div>
+                <div>
+                  <h3>Execution</h3>
+                  <p>Uses MCP and LLM tool calling to inspect, patch, and validate code.</p>
+                </div>
+                <div>
+                  <h3>Observability</h3>
+                  <p>Captures tool activity and verification steps through OpenTelemetry.</p>
+                </div>
+              </div>
+              <div class="cert-list">
+                <span>Python</span><span>MCP</span><span>LLM tool calling</span><span>Git</span><span>Docker</span><span>OpenTelemetry</span>
+              </div>
+            </div>
+          </article>
+
           <article class="case-study" id="enterprise-data-chatbot">
             <div class="case-marker">01</div>
             <div class="case-body">
