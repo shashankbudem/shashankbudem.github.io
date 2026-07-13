@@ -12,7 +12,6 @@
     <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
     <meta name="theme-color" content="#080c0f" />
     <link rel="canonical" href="https://shashankbudem.github.io/" />
-    <link rel="preload" as="image" href="./assets/hero-tech-bro.png" fetchpriority="high" />
     <meta property="og:type" content="profile" />
     <meta property="og:locale" content="en_IN" />
     <meta property="og:site_name" content="Budem Shashank Portfolio" />
@@ -114,7 +113,7 @@
 
     <main>
       <section class="hero" id="home">
-        <img class="hero-image" src="./assets/hero-tech-bro.png" alt="AI engineering workspace with code and system dashboards" fetchpriority="high" decoding="async" />
+        <canvas class="hero-canvas" data-hero-canvas aria-hidden="true"></canvas>
         <div class="hero-overlay"></div>
         <div class="hero-content">
           <p class="eyebrow">AI Systems Engineer / Hyderabad</p>
@@ -306,6 +305,7 @@
     </footer>
 
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <script src="./hero-3d.js"></script>
     <script src="./script.js"></script>
   </body>
 </html>

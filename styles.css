@@ -172,9 +172,24 @@ a {
   overflow: hidden;
   padding: 124px clamp(18px, 4vw, 56px) 74px;
   border-bottom: 1px solid var(--line);
+  background:
+    radial-gradient(ellipse at 68% 40%, rgba(54, 217, 255, 0.07), transparent 62%),
+    var(--bg);
+  cursor: none;
 }
 
-.hero-image,
+.hero a,
+.hero button {
+  cursor: pointer;
+}
+
+@media (pointer: coarse) {
+  .hero {
+    cursor: auto;
+  }
+}
+
+.hero-canvas,
 .hero-overlay {
   position: absolute;
   inset: 0;
@@ -182,14 +197,11 @@ a {
   height: 100%;
 }
 
-.hero-image {
-  object-fit: cover;
-}
-
 .hero-overlay {
   background:
-    linear-gradient(90deg, rgba(8, 12, 15, 0.98) 0%, rgba(8, 12, 15, 0.88) 42%, rgba(8, 12, 15, 0.24) 82%),
-    linear-gradient(0deg, rgba(8, 12, 15, 0.72), rgba(8, 12, 15, 0.04));
+    linear-gradient(90deg, rgba(8, 12, 15, 0.92) 0%, rgba(8, 12, 15, 0.66) 42%, rgba(8, 12, 15, 0.08) 82%),
+    linear-gradient(0deg, rgba(8, 12, 15, 0.5), rgba(8, 12, 15, 0.02));
+  pointer-events: none;
 }
 
 .hero-content {
