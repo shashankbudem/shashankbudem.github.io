@@ -175,18 +175,11 @@ a {
   background:
     radial-gradient(ellipse at 68% 40%, rgba(54, 217, 255, 0.07), transparent 62%),
     var(--bg);
-  cursor: none;
 }
 
-.hero a,
-.hero button {
-  cursor: pointer;
-}
-
-@media (pointer: coarse) {
-  .hero {
-    cursor: auto;
-  }
+html.has-custom-cursor,
+html.has-custom-cursor * {
+  cursor: none !important;
 }
 
 .hero-canvas,

@@ -48,7 +48,7 @@
   }
 
   // ---------- Pointer / camera / shockwaves ----------
-  const pointer = { x: 0, y: 0, nx: 0.5, ny: 0.42, active: false, speed: 0, down: 0 };
+  const pointer = { x: 0, y: 0, nx: 0.5, ny: 0.42, active: false, speed: 0 };
   const reticle = { x: 0, y: 0, seeded: false };
   const glowPos = { x: 0, y: 0 };
   const camera = { rx: 0, ry: 0 };
@@ -275,64 +275,6 @@
     }
   }
 
-  function drawReticle(t) {
-    if (!pointer.active) return;
-    const press = pointer.down;
-    const energy = Math.min(1, pointer.speed / 900);
-    const base = 17 + energy * 9 + press * 8;
-
-    ctx.save();
-    ctx.translate(reticle.x, reticle.y);
-
-    // Outer rotating arc segments
-    ctx.strokeStyle = `rgba(${CYAN}, ${0.9 - press * 0.25})`;
-    ctx.lineWidth = 1.6;
-    const spin = t * (1.1 + energy * 2.4);
-    for (let s = 0; s < 3; s += 1) {
-      const start = spin + (s * Math.PI * 2) / 3;
-      ctx.beginPath();
-      ctx.arc(0, 0, base, start, start + Math.PI / 2.6);
-      ctx.stroke();
-    }
-    // Inner steady ring
-    ctx.strokeStyle = `rgba(${CYAN}, 0.5)`;
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.arc(0, 0, base * 0.55, 0, Math.PI * 2);
-    ctx.stroke();
-    // Crosshair ticks
-    ctx.strokeStyle = `rgba(${AMBER}, 0.95)`;
-    ctx.lineWidth = 1.4;
-    const tick = base + 7;
-    ctx.beginPath();
-    ctx.moveTo(-tick, 0);
-    ctx.lineTo(-tick + 6, 0);
-    ctx.moveTo(tick - 6, 0);
-    ctx.lineTo(tick, 0);
-    ctx.moveTo(0, -tick);
-    ctx.lineTo(0, -tick + 6);
-    ctx.moveTo(0, tick - 6);
-    ctx.lineTo(0, tick);
-    ctx.stroke();
-    // Center dot
-    ctx.fillStyle = `rgba(${AMBER}, 1)`;
-    ctx.beginPath();
-    ctx.arc(0, 0, 2.2 + press * 1.6, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-  }
-
-  function drawWaves() {
-    for (let i = 0; i < waves.length; i += 1) {
-      const w = waves[i];
-      ctx.strokeStyle = `rgba(${AMBER}, ${(w.life * 0.45).toFixed(3)})`;
-      ctx.lineWidth = 2 * w.life + 0.4;
-      ctx.beginPath();
-      ctx.arc(w.x, w.y, w.r, 0, Math.PI * 2);
-      ctx.stroke();
-    }
-  }
-
   function drawFrame(t, dt) {
     ctx.fillStyle = BG;
     ctx.fillRect(0, 0, width, height);
@@ -352,8 +294,6 @@
     drawGrid();
     updateNodes(dt);
     drawNodes(t);
-    drawWaves();
-    drawReticle(t);
   }
 
   function frame(now) {
@@ -374,7 +314,6 @@
     glowPos.x += (pointer.x - glowPos.x) * Math.min(1, dt * 2);
     glowPos.y += (pointer.y - glowPos.y) * Math.min(1, dt * 2);
     pointer.speed *= Math.max(0, 1 - dt * 6);
-    pointer.down = Math.max(0, pointer.down - dt * 4);
 
     for (let i = waves.length - 1; i >= 0; i -= 1) {
       const w = waves[i];
@@ -424,7 +363,6 @@
 
   function onPointerDown(event) {
     onPointerMove(event);
-    pointer.down = 1;
     waves.push({ x: pointer.x, y: pointer.y, r: 10, life: 1 });
     if (waves.length > 5) waves.shift();
   }
