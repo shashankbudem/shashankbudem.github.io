@@ -1,0 +1,1267 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Arrow Cursor Designer</title>
+<style>
+  :root{
+    --bg:#F6F2F1; --surface:#FFFFFF; --panel:#FCFAF9; --raised:#F1EAE8;
+    --border:#E7DEDC; --border-strong:#D8CCCA;
+    --text:#241E1F; --muted:#877B79; --faint:#A99E9C;
+    --accent:#DD3931; --accent-press:#C22A23; --facet:#F06860;
+    --focus:#DD3931;
+    --shadow:0 1px 2px rgba(40,20,18,.06),0 8px 24px rgba(40,20,18,.06);
+    --chk-a:#EDE7E5; --chk-b:#DCD3D0;
+    --radius:12px;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --bg:#151112; --surface:#1E1819; --panel:#1A1516; --raised:#251E1F;
+      --border:#322A2B; --border-strong:#3E3435;
+      --text:#EFE8E7; --muted:#9C908E; --faint:#6F6462;
+      --accent:#F0655C; --accent-press:#F58B84; --facet:#F58C84;
+      --focus:#F0655C;
+      --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 30px rgba(0,0,0,.35);
+      --chk-a:#211B1C; --chk-b:#2C2425;
+    }
+  }
+  :root[data-theme="light"]{
+    --bg:#F6F2F1; --surface:#FFFFFF; --panel:#FCFAF9; --raised:#F1EAE8;
+    --border:#E7DEDC; --border-strong:#D8CCCA;
+    --text:#241E1F; --muted:#877B79; --faint:#A99E9C;
+    --accent:#DD3931; --accent-press:#C22A23; --facet:#F06860; --focus:#DD3931;
+    --shadow:0 1px 2px rgba(40,20,18,.06),0 8px 24px rgba(40,20,18,.06);
+    --chk-a:#EDE7E5; --chk-b:#DCD3D0;
+  }
+  :root[data-theme="dark"]{
+    --bg:#151112; --surface:#1E1819; --panel:#1A1516; --raised:#251E1F;
+    --border:#322A2B; --border-strong:#3E3435;
+    --text:#EFE8E7; --muted:#9C908E; --faint:#6F6462;
+    --accent:#F0655C; --accent-press:#F58B84; --facet:#F58C84; --focus:#F0655C;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 30px rgba(0,0,0,.35);
+    --chk-a:#211B1C; --chk-b:#2C2425;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);
+    line-height:1.5;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1120px;margin:0 auto;padding:28px 22px 56px;}
+  header.masthead{display:flex;align-items:baseline;justify-content:space-between;
+    gap:16px;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:18px;margin-bottom:24px;}
+  .title{font-size:23px;font-weight:650;letter-spacing:-.02em;margin:0;}
+  .title b{color:var(--accent);font-weight:650;}
+  .subtitle{color:var(--muted);font-size:13.5px;margin:3px 0 0;max-width:52ch;}
+  .eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--faint);font-weight:600;}
+
+  .grid{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:22px;align-items:start;}
+  @media (max-width:820px){.grid{grid-template-columns:1fr;}}
+
+  /* ---- stage ---- */
+  .stage{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+    box-shadow:var(--shadow);overflow:hidden;position:sticky;top:18px;}
+  @media (max-width:820px){.stage{position:static;}}
+  .stage-head{display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding:12px 14px;border-bottom:1px solid var(--border);}
+  .swatches{display:flex;gap:7px;}
+  .sw{width:24px;height:24px;border-radius:7px;border:1px solid var(--border-strong);
+    cursor:pointer;padding:0;background:transparent;position:relative;}
+  .sw[aria-pressed="true"]{outline:2px solid var(--accent);outline-offset:1px;}
+  .sw.light{background:#fff}.sw.dark{background:#26201f}
+  .sw.chk{background:
+    conic-gradient(var(--chk-b) 25%,var(--chk-a) 0 50%,var(--chk-b) 0 75%,var(--chk-a) 0);
+    background-size:12px 12px;}
+  .canvas-hold{display:grid;place-items:center;padding:26px;min-height:360px;}
+  #preview{width:340px;height:340px;max-width:100%;border-radius:8px;touch-action:none;}
+  .stage-foot{display:flex;align-items:center;justify-content:space-between;gap:14px;
+    padding:12px 16px;border-top:1px solid var(--border);flex-wrap:wrap;}
+  .actual{display:flex;align-items:center;gap:14px;}
+  .actual .mini{display:flex;align-items:center;gap:7px;color:var(--muted);font-size:11.5px;}
+  .actual canvas{image-rendering:auto;border-radius:4px;}
+  .hs-note{font-size:11.5px;color:var(--muted);font-family:var(--mono);}
+  .hs-note b{color:var(--text);font-weight:600;}
+
+  /* ---- controls ---- */
+  .panel{display:flex;flex-direction:column;gap:14px;}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);
+    padding:15px 16px 17px;}
+  .card h3{margin:0 0 13px;font-size:11px;letter-spacing:.15em;text-transform:uppercase;
+    color:var(--faint);font-weight:600;}
+  .row{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+  .row:last-child{margin-bottom:0;}
+  .row .lab{display:flex;align-items:baseline;justify-content:space-between;gap:8px;}
+  .row .lab span{font-size:13px;color:var(--text);}
+  .row .lab output{font-family:var(--mono);font-size:12px;color:var(--muted);
+    font-variant-numeric:tabular-nums;}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:4px;
+    border-radius:3px;background:var(--raised);outline:none;margin:6px 0;}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;height:17px;
+    border-radius:50%;background:var(--surface);border:2px solid var(--accent);cursor:pointer;
+    box-shadow:0 1px 3px rgba(0,0,0,.2);transition:transform .08s;}
+  input[type=range]::-webkit-slider-thumb:active{transform:scale(1.15);}
+  input[type=range]::-moz-range-thumb{width:17px;height:17px;border-radius:50%;
+    background:var(--surface);border:2px solid var(--accent);cursor:pointer;}
+  input[type=range]:focus-visible{box-shadow:0 0 0 3px color-mix(in srgb,var(--focus) 35%,transparent);}
+
+  .seg{display:flex;background:var(--raised);border-radius:9px;padding:3px;gap:3px;}
+  .seg button{flex:1;border:none;background:transparent;color:var(--muted);
+    font-family:var(--sans);font-size:12.5px;font-weight:550;padding:6px 8px;border-radius:7px;
+    cursor:pointer;transition:all .12s;}
+  .seg button[aria-pressed="true"]{background:var(--surface);color:var(--text);
+    box-shadow:0 1px 2px rgba(0,0,0,.12);}
+  .seg button:focus-visible{outline:2px solid var(--focus);outline-offset:1px;}
+
+  .toggle{display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;
+    user-select:none;}
+  .toggle span{font-size:13px;}
+  .switch{width:40px;height:23px;border-radius:12px;background:var(--border-strong);position:relative;
+    transition:background .15s;flex:none;border:none;cursor:pointer;padding:0;}
+  .switch::after{content:"";position:absolute;top:2px;left:2px;width:19px;height:19px;border-radius:50%;
+    background:#fff;transition:transform .15s;box-shadow:0 1px 2px rgba(0,0,0,.25);}
+  .switch[aria-checked="true"]{background:var(--accent);}
+  .switch[aria-checked="true"]::after{transform:translateX(17px);}
+  .switch:focus-visible{outline:2px solid var(--focus);outline-offset:2px;}
+
+  .colorrow{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+  .colorrow:last-child{margin-bottom:0;}
+  .colorrow label{font-size:13px;flex:1;}
+  .swatch-in{position:relative;width:34px;height:26px;border-radius:7px;overflow:hidden;
+    border:1px solid var(--border-strong);flex:none;}
+  .swatch-in input[type=color]{position:absolute;inset:-4px;width:calc(100% + 8px);
+    height:calc(100% + 8px);border:none;padding:0;cursor:pointer;background:none;}
+  .hexin{width:92px;font-family:var(--mono);font-size:12.5px;padding:6px 8px;border-radius:7px;
+    border:1px solid var(--border);background:var(--surface);color:var(--text);text-transform:uppercase;
+    font-variant-numeric:tabular-nums;}
+  .hexin:focus-visible{outline:2px solid var(--focus);outline-offset:0;border-color:var(--accent);}
+  .colorrow.disabled{opacity:.4;pointer-events:none;}
+
+  .exportgrid{display:flex;gap:10px;}
+  .btn{flex:1;border:1px solid var(--border-strong);background:var(--surface);color:var(--text);
+    font-family:var(--sans);font-size:13px;font-weight:550;padding:10px 12px;border-radius:9px;
+    cursor:pointer;transition:all .12s;display:inline-flex;align-items:center;justify-content:center;gap:7px;}
+  .btn:hover{border-color:var(--accent);color:var(--accent);}
+  .btn:active{transform:translateY(1px);}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .btn.primary:hover{background:var(--accent-press);border-color:var(--accent-press);color:#fff;}
+  .btn:focus-visible{outline:2px solid var(--focus);outline-offset:2px;}
+  .sel{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+  .sel label{font-size:13px;color:var(--text);}
+  select{font-family:var(--sans);font-size:13px;padding:6px 8px;border-radius:8px;
+    border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;}
+  select:focus-visible{outline:2px solid var(--focus);}
+
+  .readout{margin-top:2px;}
+  .readout .code{font-family:var(--mono);font-size:11.5px;line-height:1.7;color:var(--muted);
+    background:var(--raised);border:1px solid var(--border);border-radius:9px;padding:10px 12px;
+    white-space:pre-wrap;word-break:break-word;}
+  .readout .code b{color:var(--text);font-weight:600;}
+  .hint{font-size:12px;color:var(--muted);margin:10px 0 0;}
+  .hint.ok{color:var(--accent);}
+  .foot{margin-top:26px;padding-top:16px;border-top:1px solid var(--border);
+    color:var(--muted);font-size:12.5px;}
+  .foot a{color:var(--accent);text-decoration:none;}
+  .foot a:hover{text-decoration:underline;}
+  #refControls.refoff{display:none;}
+  #traceControls.isoff{display:none;}
+  .refempty-hide{display:none;}
+  #preview.grab{cursor:grab;}
+  #preview.grabbing{cursor:grabbing;}
+  #preview.plot{cursor:crosshair;}
+  /* ---- playground ---- */
+  .play{margin-top:22px;background:var(--surface);border:1px solid var(--border);
+    border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;}
+  .play-head{display:flex;align-items:center;justify-content:space-between;gap:14px;
+    padding:12px 16px;border-bottom:1px solid var(--border);flex-wrap:wrap;}
+  .play-head .grp{display:flex;align-items:center;gap:10px;}
+  .play-body{padding:26px;display:grid;gap:20px;
+    grid-template-columns:repeat(auto-fit,minmax(230px,1fr));}
+  .demo{border:1px solid var(--border);border-radius:10px;padding:16px;background:var(--panel);
+    display:flex;flex-direction:column;gap:11px;}
+  .demo h4{margin:0;font-size:13px;font-weight:600;}
+  .demo p{margin:0;font-size:13px;color:var(--muted);}
+  .demo a{color:var(--accent);}
+  .fauxbtn{border:1px solid var(--border-strong);background:var(--surface);color:var(--text);
+    font:550 13px var(--sans);padding:9px 12px;border-radius:8px;text-align:center;}
+  .fauxbtn.solid{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .fauxin{border:1px solid var(--border);background:var(--surface);color:var(--muted);
+    font:13px var(--sans);padding:9px 11px;border-radius:8px;}
+  .swatchrow{display:flex;gap:8px;}
+  .swatchrow i{flex:1;height:34px;border-radius:7px;display:block;}
+  .play-note{padding:0 16px 14px;font-size:12px;color:var(--muted);}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="masthead">
+    <div>
+      <p class="eyebrow">Cursor studio</p>
+      <h1 class="title">Arrow <b>Cursor</b> Designer</h1>
+      <p class="subtitle">Shape it live, then export. Same geometry as the render files — what you see is what ships.</p>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- STAGE -->
+    <section class="stage" aria-label="Live preview">
+      <div class="stage-head">
+        <span class="eyebrow">Preview</span>
+        <div class="swatches" role="group" aria-label="Backdrop">
+          <button class="sw chk" data-bg="chk" aria-pressed="true" title="Transparent"></button>
+          <button class="sw light" data-bg="light" aria-pressed="false" title="Light"></button>
+          <button class="sw dark" data-bg="dark" aria-pressed="false" title="Dark"></button>
+        </div>
+      </div>
+      <div class="canvas-hold" id="canvasHold">
+        <canvas id="preview" width="680" height="680"></canvas>
+      </div>
+      <div class="stage-foot">
+        <div class="actual">
+          <div class="mini"><canvas id="a32" width="32" height="32"></canvas><span>32&nbsp;px</span></div>
+          <div class="mini"><canvas id="a48" width="48" height="48"></canvas><span>48&nbsp;px</span></div>
+        </div>
+        <div class="hs-note">hotspot&nbsp;<b id="hsOut">—</b></div>
+      </div>
+    </section>
+
+    <!-- CONTROLS -->
+    <div class="panel">
+      <div class="card">
+        <h3>Direction</h3>
+        <div class="seg" role="group" aria-label="Facing" id="facing">
+          <button data-face="right" aria-pressed="false">Up-right ↗</button>
+          <button data-face="left" aria-pressed="true">Up-left ↖</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Shape</h3>
+        <div class="row" style="margin-bottom:16px;">
+          <div class="seg" role="group" aria-label="Shape source" id="shapeSrc">
+            <button data-shape="traced" aria-pressed="true">Traced ✓</button>
+            <button data-shape="dart" aria-pressed="false">Parametric</button>
+          </div>
+        </div>
+        <div id="tracedShape">
+          <div class="row">
+            <div class="lab"><span>Corner curve</span><output id="oTRad">24</output></div>
+            <input type="range" id="tRad" min="0" max="40" step="1" value="24">
+          </div>
+          <div class="toggle" style="margin-bottom:4px;"><span>Matched corners</span>
+            <button class="switch" id="tUni" role="switch" aria-checked="true" aria-label="Matched corners"></button>
+          </div>
+          <p class="hint" id="uniHint">Every corner gets the <b>same</b> curve — the outline is
+            rebuilt from its true edges, so the top matches both ends. Above ~24 the
+            sharper ends stop matching; 24 is the largest that stays even.</p>
+          <div class="toggle" id="simpRow" style="display:none;margin-bottom:4px;"><span>Clean up edges</span>
+            <button class="switch" id="tSimp" role="switch" aria-checked="true" aria-label="Simplify outline"></button>
+          </div>
+          <button class="btn" id="toPlot" style="margin-top:12px;width:100%;">Edit points in plot mode</button>
+        </div>
+        <div id="dartShape" style="display:none;">
+        <div class="row">
+          <div class="lab"><span>Tilt</span><output id="oTilt">54°</output></div>
+          <input type="range" id="tilt" min="30" max="72" step="1" value="54">
+        </div>
+        <div class="row">
+          <div class="lab"><span>Length</span><output id="oLen">72</output></div>
+          <input type="range" id="len" min="50" max="96" step="1" value="72">
+        </div>
+        <div class="row">
+          <div class="lab"><span>Width</span><output id="oWid">66</output></div>
+          <input type="range" id="wid" min="44" max="88" step="1" value="66">
+        </div>
+        <div class="row">
+          <div class="lab"><span>Tail notch</span><output id="oNotch">17</output></div>
+          <input type="range" id="notch" min="0" max="34" step="1" value="17">
+        </div>
+        <div class="row">
+          <div class="lab"><span>Corner rounding</span><output id="oRad">6</output></div>
+          <input type="range" id="rad" min="0" max="16" step="1" value="6">
+        </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Color</h3>
+        <div class="colorrow">
+          <label for="mainColor">Main</label>
+          <span class="swatch-in"><input type="color" id="mainColor" value="#C10101"></span>
+          <input type="text" class="hexin" id="mainHex" value="#C10101" spellcheck="false" aria-label="Main hex">
+        </div>
+        <div class="colorrow" id="facetRow">
+          <label for="facetColor">Facet</label>
+          <span class="swatch-in"><input type="color" id="facetColor" value="#CD3434"></span>
+          <input type="text" class="hexin" id="facetHex" value="#CD3434" spellcheck="false" aria-label="Facet hex">
+        </div>
+        <div class="row" style="margin:14px 0 0;">
+          <div class="toggle"><span>Two-tone facet</span>
+            <button class="switch" id="twoTone" role="switch" aria-checked="false" aria-label="Two-tone facet"></button>
+          </div>
+        </div>
+        <div class="row" id="wingRow" style="margin-top:12px;">
+          <div class="seg" role="group" aria-label="Facet side" id="wing">
+            <button data-wing="lower" aria-pressed="true">Facet lower</button>
+            <button data-wing="upper" aria-pressed="false">Facet upper</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Depth</h3>
+        <div class="toggle" style="margin-bottom:12px;"><span>Drop shadow</span>
+          <button class="switch" id="shadowOn" role="switch" aria-checked="true" aria-label="Shadow"></button>
+        </div>
+        <div id="shadowCtl">
+          <div class="row">
+            <div class="lab"><span>Softness</span><output id="oShBlur">4</output></div>
+            <input type="range" id="shBlur" min="0" max="12" step="1" value="4">
+          </div>
+          <div class="row">
+            <div class="lab"><span>Offset down</span><output id="oShDy">3</output></div>
+            <input type="range" id="shDy" min="0" max="10" step="1" value="3">
+          </div>
+          <div class="row" style="margin-bottom:4px;">
+            <div class="lab"><span>Strength</span><output id="oShA">28%</output></div>
+            <input type="range" id="shAlpha" min="0" max="70" step="1" value="28">
+          </div>
+          <p class="hint">Keep it low — above ~40% it stops reading as subtle,
+            and a wide soft shadow can clip at the canvas edge.</p>
+        </div>
+        <div class="toggle" style="margin:16px 0 12px;"><span>Gradient fill</span>
+          <button class="switch" id="gradOn" role="switch" aria-checked="false" aria-label="Gradient"></button>
+        </div>
+        <div id="gradCtl" style="display:none;">
+          <div class="colorrow">
+            <label for="gradTo">Fades to</label>
+            <span class="swatch-in"><input type="color" id="gradTo" value="#8B0000"></span>
+            <input type="text" class="hexin" id="gradToHex" value="#8B0000" spellcheck="false" aria-label="Gradient end hex">
+          </div>
+          <div class="row" style="margin-top:14px;">
+            <div class="lab"><span>Angle</span><output id="oGrA">55°</output></div>
+            <input type="range" id="gradAngle" min="0" max="360" step="5" value="55">
+          </div>
+          <p class="hint">Starts from the main colour above and fades to this one.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Border</h3>
+        <div class="row">
+          <div class="lab"><span>White border</span><output id="oBord">8</output></div>
+          <input type="range" id="bord" min="0" max="18" step="1" value="8">
+        </div>
+        <div class="colorrow">
+          <label for="bordColor">Colour</label>
+          <span class="swatch-in"><input type="color" id="bordColor" value="#FFFFFF"></span>
+          <input type="text" class="hexin" id="bordHex" value="#FFFFFF" spellcheck="false" aria-label="Border hex">
+        </div>
+        <p class="hint">Keeps the cursor readable on any background. Set to 0 for none.</p>
+      </div>
+
+      <div class="card">
+        <h3>Shine</h3>
+        <div class="toggle" style="margin-bottom:12px;"><span>Gloss streak</span>
+          <button class="switch" id="shineOn" role="switch" aria-checked="false" aria-label="Shine"></button>
+        </div>
+        <div id="shineCtl">
+          <div class="colorrow">
+            <label for="shineColor">Colour</label>
+            <span class="swatch-in"><input type="color" id="shineColor" value="#DA6E6E"></span>
+            <input type="text" class="hexin" id="shineHex" value="#DA6E6E" spellcheck="false" aria-label="Shine hex">
+          </div>
+          <div class="row" style="margin-top:14px;">
+            <div class="lab"><span>Position</span><output id="oShPos">24%</output></div>
+            <input type="range" id="shPos" min="0" max="70" step="1" value="24">
+          </div>
+          <div class="row">
+            <div class="lab"><span>Length</span><output id="oShLen">26%</output></div>
+            <input type="range" id="shLen" min="6" max="50" step="1" value="26">
+          </div>
+          <div class="row">
+            <div class="lab"><span>Thickness</span><output id="oShW">16</output></div>
+            <input type="range" id="shW" min="4" max="34" step="1" value="16">
+          </div>
+          <div class="row">
+            <div class="lab"><span>Distance from edge</span><output id="oShIn">27</output></div>
+            <input type="range" id="shIn" min="10" max="60" step="1" value="27">
+          </div>
+          <div class="row" style="margin-bottom:4px;">
+            <div class="lab"><span>Blur</span><output id="oShBl">0</output></div>
+            <input type="range" id="shBl" min="0" max="20" step="1" value="0">
+          </div>
+          <p class="hint">0 is a hard-edged bar; higher values soften it into a glow.
+            It stays clipped inside the shape either way.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Reference layer</h3>
+        <div class="exportgrid" style="margin-bottom:12px;">
+          <button class="btn" id="refUpload">Upload…</button>
+          <button class="btn" id="refOrig">Original</button>
+          <button class="btn" id="refHD">HD arrow</button>
+        </div>
+        <input type="file" id="refFile" accept="image/*" hidden>
+        <div id="refControls" class="refoff">
+          <div class="row">
+            <div class="lab"><span>Opacity</span><output id="oOpac">45%</output></div>
+            <input type="range" id="opac" min="0" max="100" step="1" value="45">
+          </div>
+          <div class="row">
+            <div class="lab"><span>Scale</span><output id="oScale">100%</output></div>
+            <input type="range" id="rscale" min="20" max="250" step="1" value="100">
+          </div>
+          <div class="row" style="margin-bottom:12px;">
+            <div class="seg" role="group" aria-label="Layer order" id="reforder">
+              <button data-over="false" aria-pressed="true">Under dart</button>
+              <button data-over="true" aria-pressed="false">Over dart</button>
+            </div>
+          </div>
+          <div class="toggle" style="margin-bottom:12px;"><span>Dart as outline</span>
+            <button class="switch" id="outline" role="switch" aria-checked="false" aria-label="Show dart as outline"></button>
+          </div>
+          <div class="exportgrid">
+            <button class="btn" id="refFit">Recenter</button>
+            <button class="btn" id="refClear">Remove</button>
+          </div>
+          <p class="hint">Drag on the preview to position it. The reference is preview-only — never exported.</p>
+        </div>
+        <p class="hint" id="refEmpty">Load an image to trace over — set it faint, then match the shape with the sliders (or the outline toggle).</p>
+      </div>
+
+      <div class="card">
+        <h3>Trace points</h3>
+        <div class="toggle" style="margin-bottom:4px;"><span>Plot mode — click the preview to drop points</span>
+          <button class="switch" id="plot" role="switch" aria-checked="false" aria-label="Plot mode"></button>
+        </div>
+        <div id="traceControls" class="isoff">
+          <div class="exportgrid" style="margin:12px 0;">
+            <button class="btn" id="tUndo">Undo</button>
+            <button class="btn" id="tClear">Clear</button>
+          </div>
+          <div class="toggle" style="margin-bottom:12px;"><span>Close &amp; fill shape</span>
+            <button class="switch" id="tClosed" role="switch" aria-checked="true" aria-label="Close and fill"></button>
+          </div>
+          <div class="row">
+            <div class="lab"><span>Smooth corners</span><output id="oSmooth">0</output></div>
+            <input type="range" id="tSmooth" min="0" max="24" step="1" value="0">
+          </div>
+          <div class="readout">
+            <div class="code" id="tCoords">no points yet — click on the preview</div>
+            <div class="exportgrid" style="margin-top:10px;">
+              <button class="btn" id="tCopyPts">Copy points</button>
+              <button class="btn" id="tCopySvg">Copy SVG</button>
+            </div>
+            <button class="btn primary" id="tDlSvg" style="margin-top:10px;width:100%;">Download traced SVG</button>
+            <p class="hint">First point = hotspot. Drag a dot to nudge it. Paste the points to me for a ready-to-use <b>.cur</b>.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Export</h3>
+        <div class="sel">
+          <label for="size">Size</label>
+          <select id="size">
+            <option>128</option><option selected>256</option><option>512</option><option>1024</option>
+          </select>
+          <span style="color:var(--muted);font-size:12.5px;">px, transparent</span>
+        </div>
+        <div class="exportgrid">
+          <button class="btn primary" id="dlPng">Download PNG</button>
+          <button class="btn" id="dlSvg">Download SVG</button>
+        </div>
+        <p class="hint" id="dlHint">Tip: if a download doesn’t start, right-click the preview → “Save image as”.</p>
+        <div class="readout">
+          <h3 style="margin:16px 0 8px;">Recipe for the .cur file</h3>
+          <div class="code" id="recipe"></div>
+          <button class="btn" id="copyBtn" style="margin-top:10px;width:100%;">Copy recipe</button>
+          <p class="hint">Paste this back to me and I’ll pack the ready-to-use multi-resolution <b>.cur</b> (with the hotspot baked in) from the same math.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="play" id="play" aria-label="Cursor playground">
+    <div class="play-head">
+      <span class="eyebrow">Try it — your pointer becomes this cursor in here</span>
+      <div class="grp">
+        <label for="playSize" style="font-size:12.5px;color:var(--muted);">Size</label>
+        <select id="playSize">
+          <option>16</option><option>20</option><option>24</option>
+          <option selected>32</option><option>48</option><option>64</option>
+        </select>
+        <div class="toggle" style="gap:8px;"><span style="font-size:12.5px;">Whole page</span>
+          <button class="switch" id="playAll" role="switch" aria-checked="false" aria-label="Apply to whole page"></button>
+        </div>
+      </div>
+    </div>
+    <div class="play-body">
+      <div class="demo">
+        <h4>Buttons</h4>
+        <div class="fauxbtn solid">Primary action</div>
+        <div class="fauxbtn">Secondary</div>
+      </div>
+      <div class="demo">
+        <h4>Reading</h4>
+        <p>Move around over text to see how the tip sits against small type,
+          and whether the <a href="#play">link colour</a> still reads underneath it.</p>
+      </div>
+      <div class="demo">
+        <h4>Form</h4>
+        <div class="fauxin">name@example.com</div>
+        <div class="fauxin">••••••••</div>
+      </div>
+      <div class="demo">
+        <h4>On colour</h4>
+        <div class="swatchrow">
+          <i style="background:#ffffff;border:1px solid var(--border);"></i>
+          <i style="background:#8a8a90;"></i>
+          <i style="background:#1c1c20;"></i>
+          <i style="background:#C10101;"></i>
+        </div>
+        <p>The border earns its keep on the darker and same-colour tiles.</p>
+      </div>
+    </div>
+    <p class="play-note" id="playNote"></p>
+  </section>
+
+  <p class="foot">Prefer a full editor? Draw pixel-by-pixel and export .cur/.ani at
+    <a href="https://www.cursor.cc/" target="_blank" rel="noopener">cursor.cc</a> or
+    <a href="https://mousetesting.com/en/tests/cursor-builder" target="_blank" rel="noopener">MouseTesting’s cursor builder</a> (multi-size .cur in the browser), or
+    <a href="https://www.rw-designer.com/cursor-maker" target="_blank" rel="noopener">RealWorld Cursor Editor</a> (free desktop app, animated cursors). Or upload a PNG from here to
+    <a href="https://imagetocursor.com/" target="_blank" rel="noopener">ImageToCursor</a>.</p>
+</div>
+
+<script>
+"use strict";
+const REF = 256, MARGIN = 0.09;
+const S = {
+  tip_len:72, back:66, back_len:52, notch:17, angle_deg:54, radius:6,
+  main:"#C10101", facet:"#CD3434", twoTone:false, wing:"lower", face:"left",
+  bg:"chk", exportSize:256, outline:false,
+  border:8, borderColor:"#FFFFFF",
+  shadow:true, shDx:2, shDy:3, shBlur:4, shAlpha:0.28,
+  grad:false, gradTo:"#8B0000", gradAngle:55,
+  shape:"traced", tracedRadius:24, tracedSimplify:true, tracedUniform:true,
+  shine:false, shineColor:"#DA6E6E", shineT0:0.24, shineT1:0.50, shineInset:27, shineWidth:16,
+  shineBlur:0
+};
+// reference-tracing layer (preview only, never exported)
+const ref = { img:null, x:128, y:128, scale:1, opacity:0.45, over:false };
+// point-tracing layer — click to record coordinates, build an SVG from them
+const trace = { on:false, pts:[], closed:true, smooth:0, sel:-1 };
+const REF_ORIG = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAADJklEQVR4nO2Xb0gTYRzHvzuOsTSKpm7hP6IljjmFrBcSEZEYMQR9YRCKLwRlLyWUyBD2SG+tNybpC5EEw1Ygli9CRXtjGrZVVgwEt0hc00Ye223O23nXi9MIK7uRtxneBx6eg/vx/L7f5/e75+4AFZXkMuVwXEi1hoPNlMPRn2oNB5sph0NMtYaDzX6rAJVIMAFoY0mJMez3X1mZnzcTgCYJrqE42+f89mmzveOT7e3iV4/ncoxhxDWv902MYUSOZUdedHSIBKB/it9/7wkCUAQ4wm9sLA5UVHgIIN7WauMLo6OuTY5b8rtclwigJSmohtyE1Pm2tlyIot47Pm4GgE2Oox9WVpY+s9tDxuLixy1+/w0AOpJkE7KT0TrdYVH89fl9299vuWc2CxRNN7SFw8O27u5sAtB7KXI3ZFdA4HkKovjb+DWvN/NOTk6+b3Iy80xT04zd7b5IktRSshMI8fjf7tNDVVWlTxsbQwar9VGL338TSWipPV/83cCApauwUNBQVP0tlh2p7O3NJQq2lCK7w/h8mXfz8k54Jyb0pxsaZq46nSeJQibktxDPJ7SwEI/TQ9XVpa+6ulYLbLY+ALpExclB8YdsrLW1hNbpzhbX1uqVWF/x467AZvvEx2KUZ3g4sRLKRLYBYXNz9wCNBgardVVvMkWPmUyc3mQSsoqKqNyysuz3g4PX+fX11BrYjSyLJVg/Ps5p09PBRSIhjmWDG6HQajQYDDxvbp563dPzAUBsL3Lt5J8NHM3PZxpnZ6nFsTGns6ZmGJJQDgC/NUcBsEi1gfDycpSiaa2GogRRECgASDcYWLvbzS3PzT1x1tQ8ABDaEsrvGByR5j1H7ikkfHQ6GT4WC5xrbV0AgHSjkbG73aE1n29soLz8PoAAgFUAQQDfIJlhCRAlComXDZF+XAwvOzuvcZHISjQYXI6vr4eXZmb6CGAlwHGSgi9RANDICSKSsDQA+kMZGYaSurpTn6enA19crgAABlutQwBBKaF/QpYBQKoCJBNpkK4FSP0ehdTjSRcPJGAA+FEJGtIsbA+SIvEqKioqKioqKioqKir/Nd8BcVBI9MxGscYAAAAASUVORK5CYII=";
+const REF_HD   = "data:image/png;base64,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";
+
+// ---- the traced outline (your 30 clicked points, 256x256 space) ----
+const TRACED = [[26.8,82.8],[62.6,68.4],[94.6,57.2],[123.3,48],[153.8,38],[184.6,29.2],
+  [209.4,21.6],[222,23.2],[230.8,32.2],[237.6,41.9],[232.2,57.8],[227.7,75],
+  [220.2,95.8],[210.9,124],[202.2,150.5],[191,180.3],[183.2,207],[176.8,225.2],
+  [163.5,236.1],[144.6,234.5],[130.3,209.8],[120.8,178.1],[113.8,157],
+  [111.2,147.6],[95.8,142.1],[72,135.5],[53.3,129.7],[33.9,121.6],
+  [20,108.1],[20.5,93.6]];
+
+const crossZ=(o,a,b)=>(a[0]-o[0])*(b[1]-o[1])-(a[1]-o[1])*(b[0]-o[0]);
+function turnDeg(p0,p1,p2){
+  const v1=[p1[0]-p0[0],p1[1]-p0[1]], v2=[p2[0]-p1[0],p2[1]-p1[1]];
+  const l1=Math.hypot(...v1), l2=Math.hypot(...v2);
+  if(l1<1e-9||l2<1e-9) return 0;
+  return Math.acos(Math.max(-1,Math.min(1,(v1[0]*v2[0]+v1[1]*v2[1])/(l1*l2))))*180/Math.PI;
+}
+// strongest reflex vertex = the tail notch (ignores false reflexes from click wobble)
+function findNotch(pts){
+  const n=pts.length;
+  let area=0; for(let i=0;i<n;i++){const q=pts[(i+1)%n]; area+=pts[i][0]*q[1]-q[0]*pts[i][1];}
+  const ccw=area>0; let best=null,bt=0;
+  for(let i=0;i<n;i++){
+    const c=crossZ(pts[(i-1+n)%n],pts[i],pts[(i+1)%n]);
+    if((c>0)===ccw) continue;
+    const t=turnDeg(pts[(i-1+n)%n],pts[i],pts[(i+1)%n]);
+    if(t>bt){bt=t;best=i;}
+  }
+  return best;
+}
+const findNose=pts=>pts.reduce((b,p,i)=>p[0]-p[1]>pts[b][0]-pts[b][1]?i:b,0);
+// merge near-collinear runs (cleans hand-click wobble on long edges)
+function simplifyPts(pts,angle=9){
+  let out=pts.map(p=>[p[0],p[1]]), changed=true;
+  while(changed && out.length>4){
+    changed=false;
+    for(let i=0;i<out.length;i++){
+      const n=out.length;
+      if(turnDeg(out[(i-1+n)%n],out[i],out[(i+1)%n])<angle){
+        out.splice(i,1); changed=true; break;
+      }
+    }
+  }
+  return out;
+}
+// True corners of the traced outline (intersections of its long edges).
+// Filleting THESE with one radius gives every end an identical curve —
+// filleting the raw clicked points cannot, because each corner is a cluster
+// of points and the radius gets clamped by the short gaps between them.
+const CORNERS = [[248.7027736153,8.4273288869],[155.1093940646,290.5928958545],[111.2000000000,147.6000000000],[-27.4238598239,100.9736047164]];
+
+function interiorAngle(p0,p1,p2){
+  const v1=[p0[0]-p1[0],p0[1]-p1[1]], v2=[p2[0]-p1[0],p2[1]-p1[1]];
+  const l1=Math.hypot(...v1)||1, l2=Math.hypot(...v2)||1;
+  return Math.acos(Math.max(-1,Math.min(1,(v1[0]*v2[0]+v1[1]*v2[1])/(l1*l2))));
+}
+// constant-radius circular fillets: offset per corner is derived from its angle
+function arcFillet(pts,R,steps=26,radii=null){
+  const n=pts.length, out=[];
+  for(let i=0;i<n;i++){
+    const Ri = radii ? radii[i] : R;
+    const p0=pts[(i-1+n)%n], p1=pts[i], p2=pts[(i+1)%n];
+    if(Ri<=0){ out.push([p1[0],p1[1]]); continue; }
+    const v1=[p0[0]-p1[0],p0[1]-p1[1]], v2=[p2[0]-p1[0],p2[1]-p1[1]];
+    const l1=Math.hypot(...v1)||1, l2=Math.hypot(...v2)||1;
+    const u1=[v1[0]/l1,v1[1]/l1], u2=[v2[0]/l2,v2[1]/l2];
+    const th=interiorAngle(p0,p1,p2);
+    if(th<1e-6 || Math.abs(Math.PI-th)<1e-6){ out.push([p1[0],p1[1]]); continue; }
+    const d=Math.min(Ri/Math.tan(th/2), l1*0.5, l2*0.5);
+    const rEff=d*Math.tan(th/2);
+    const pin=[p1[0]+u1[0]*d, p1[1]+u1[1]*d];
+    const pout=[p1[0]+u2[0]*d, p1[1]+u2[1]*d];
+    let bx=u1[0]+u2[0], by=u1[1]+u2[1];
+    const bl=Math.hypot(bx,by)||1; bx/=bl; by/=bl;
+    const cd=rEff/Math.sin(th/2);
+    const cx=p1[0]+bx*cd, cy=p1[1]+by*cd;
+    const a0=Math.atan2(pin[1]-cy,pin[0]-cx);
+    let da=Math.atan2(pout[1]-cy,pout[0]-cx)-a0;
+    while(da> Math.PI) da-=2*Math.PI;
+    while(da<-Math.PI) da+=2*Math.PI;
+    for(let s=0;s<=steps;s++){
+      const a=a0+da*s/steps;
+      out.push([cx+rEff*Math.cos(a), cy+rEff*Math.sin(a)]);
+    }
+  }
+  return out;
+}
+// hotspot = apex of the rounded nose, nudged just inside the edge
+function uniformTip(cp,R){
+  const p0=cp[cp.length-1], p1=cp[0], p2=cp[1];
+  const v1=[p0[0]-p1[0],p0[1]-p1[1]], v2=[p2[0]-p1[0],p2[1]-p1[1]];
+  const l1=Math.hypot(...v1)||1, l2=Math.hypot(...v2)||1;
+  const u1=[v1[0]/l1,v1[1]/l1], u2=[v2[0]/l2,v2[1]/l2];
+  const th=interiorAngle(p0,p1,p2);
+  const d=Math.min(R/Math.tan(th/2), l1*0.5, l2*0.5), rEff=d*Math.tan(th/2);
+  let bx=u1[0]+u2[0], by=u1[1]+u2[1];
+  const bl=Math.hypot(bx,by)||1; bx/=bl; by/=bl;
+  const off=rEff/Math.sin(th/2)-rEff+3;
+  return [p1[0]+bx*off, p1[1]+by*off];
+}
+// ---- solid gloss streak: a rounded capsule clipped inside the silhouette ----
+function capsulePts(p0,p1,width,steps=18){
+  const dx=p1[0]-p0[0], dy=p1[1]-p0[1];
+  const L=Math.hypot(dx,dy)||1, ux=dx/L, uy=dy/L;
+  const nx=-uy, ny=ux, r=width/2, an=Math.atan2(ny,nx), pts=[];
+  for(let s=0;s<=steps;s++){ const a=an-Math.PI*s/steps;
+    pts.push([p1[0]+r*Math.cos(a), p1[1]+r*Math.sin(a)]); }
+  for(let s=0;s<=steps;s++){ const a=an-Math.PI-Math.PI*s/steps;
+    pts.push([p0[0]+r*Math.cos(a), p0[1]+r*Math.sin(a)]); }
+  return pts;
+}
+function shineBar(cp,P){
+  const A=cp[3], B=cp[0];                     // leading edge: left corner -> nose
+  const dx=B[0]-A[0], dy=B[1]-A[1];
+  const L=Math.hypot(dx,dy)||1, ux=dx/L, uy=dy/L;
+  let nx=-uy, ny=ux;
+  const cx=cp.reduce((s,p)=>s+p[0],0)/cp.length, cy=cp.reduce((s,p)=>s+p[1],0)/cp.length;
+  const mx=(A[0]+B[0])/2, my=(A[1]+B[1])/2;
+  if((cx-mx)*nx+(cy-my)*ny<0){ nx=-nx; ny=-ny; }
+  const p0=[A[0]+ux*L*P.shineT0+nx*P.shineInset, A[1]+uy*L*P.shineT0+ny*P.shineInset];
+  const p1=[A[0]+ux*L*P.shineT1+nx*P.shineInset, A[1]+uy*L*P.shineT1+ny*P.shineInset];
+  return capsulePts(p0,p1,P.shineWidth);
+}
+
+function uniformGeometry(P){
+  let cp=CORNERS.map(p=>[p[0],p[1]]);
+  if(P.face==="left") cp=cp.map(p=>[REF-p[0],p[1]]);
+  const R=P.tracedRadius;
+  const poly=arcFillet(cp,R);
+  const wing=arcFillet([cp[0],cp[1],cp[2]],R,26,[0,R,0]);  // fold ends stay sharp
+  return {poly, wing, tip:uniformTip(cp,R), r:0, preRounded:true, shine:shineBar(cp,P)};
+}
+
+function tracedGeometry(P){
+  const pts = P.tracedSimplify ? simplifyPts(TRACED) : TRACED.map(p=>[p[0],p[1]]);
+  const nose=findNose(pts), notch=findNotch(pts), n=pts.length;
+  // facet wing: nose->notch is one side of the fold, notch->nose the other
+  const from = P.wing==="lower" ? nose : notch, to = P.wing==="lower" ? notch : nose;
+  const wing=[]; let i=from;
+  for(;;){ wing.push(pts[i]); if(i===to) break; i=(i+1)%n; }
+  let poly=pts, w=wing, tip=pts[nose];
+  if(P.face==="left"){ const flip=p=>[REF-p[0],p[1]];
+    poly=poly.map(flip); w=w.map(flip); tip=flip(tip); }
+  return {poly, wing:w, tip, r:P.tracedRadius};
+}
+
+const rot = (x,y,deg)=>{const a=-deg*Math.PI/180,c=Math.cos(a),s=Math.sin(a);
+  return [x*c-y*s, x*s+y*c];};
+
+// geometry fitted into REF x REF, mirror applied for up-left
+function geometry(P){
+  if(P.shape==="traced") return P.tracedUniform ? uniformGeometry(P) : tracedGeometry(P);
+  const T=[P.tip_len,0], A=[-P.back_len,-P.back],
+        N=[-P.back_len+P.notch,0], B=[-P.back_len,P.back];
+  const R=p=>rot(p[0],p[1],P.angle_deg);
+  let poly=[T,A,N,B].map(R);
+  let wing=(P.wing==="lower"?[T,N,B]:[T,A,N]).map(R);
+  let tip=R(T);
+  const r=P.radius;
+  const xs=poly.map(p=>p[0]), ys=poly.map(p=>p[1]);
+  const minx=Math.min(...xs)-r, maxx=Math.max(...xs)+r;
+  const miny=Math.min(...ys)-r, maxy=Math.max(...ys)+r;
+  const bw=maxx-minx, bh=maxy-miny;
+  const scale=(REF*(1-2*MARGIN))/Math.max(bw,bh);
+  const cxb=(minx+maxx)/2, cyb=(miny+maxy)/2;
+  const fit=p=>[(p[0]-cxb)*scale+REF/2,(p[1]-cyb)*scale+REF/2];
+  poly=poly.map(fit); wing=wing.map(fit); tip=fit(tip);
+  if(P.face==="left"){const flip=p=>[REF-p[0],p[1]];
+    poly=poly.map(flip); wing=wing.map(flip); tip=flip(tip);}
+  return {poly,wing,tip,r:r*scale};
+}
+
+function roundedPath(pts,r){
+  const path=new Path2D(), n=pts.length;
+  if(r<=0){                       // already-flattened outline: plain polyline,
+    path.moveTo(pts[0][0],pts[0][1]);   // no zero-length curves to upset joins
+    for(let i=1;i<n;i++) path.lineTo(pts[i][0],pts[i][1]);
+    path.closePath(); return path;
+  }
+  for(let i=0;i<n;i++){
+    const p0=pts[(i-1+n)%n], p1=pts[i], p2=pts[(i+1)%n];
+    const v1=[p0[0]-p1[0],p0[1]-p1[1]], v2=[p2[0]-p1[0],p2[1]-p1[1]];
+    const l1=Math.hypot(...v1)||1, l2=Math.hypot(...v2)||1;
+    const rr=Math.min(r,l1/2,l2/2);
+    const pin=[p1[0]+v1[0]/l1*rr,p1[1]+v1[1]/l1*rr];
+    const pout=[p1[0]+v2[0]/l2*rr,p1[1]+v2[1]/l2*rr];
+    if(i===0) path.moveTo(pin[0],pin[1]); else path.lineTo(pin[0],pin[1]);
+    path.quadraticCurveTo(p1[0],p1[1],pout[0],pout[1]);
+  }
+  path.closePath(); return path;
+}
+
+// draw the dart into ctx sized `size` (device px), scaling from REF space.
+// Does NOT clear — caller paints the backdrop (preview) or clears (mini/export).
+function drawDart(ctx,size,P,opts){
+  opts=opts||{};
+  const g=geometry(P), k=size/REF;
+  const sp=pts=>pts.map(p=>[p[0]*k,p[1]*k]);
+  const main=roundedPath(sp(g.poly), g.r*k);
+  if(opts.outline){                       // tracing aid: edge only
+    ctx.save();
+    ctx.lineJoin="round"; ctx.lineCap="round";
+    ctx.strokeStyle=P.main; ctx.lineWidth=Math.max(1.4,k*2.4); ctx.stroke(main);
+    ctx.restore();
+    return g;
+  }
+  const bw = (opts.border!==undefined) ? opts.border : P.border;
+  if(P.shadow){                      // very subtle drop shadow, drawn under everything
+    ctx.save();
+    ctx.shadowColor=`rgba(0,0,0,${P.shAlpha})`;
+    ctx.shadowBlur=P.shBlur*k*2; ctx.shadowOffsetX=P.shDx*k; ctx.shadowOffsetY=P.shDy*k;
+    ctx.fillStyle="rgba(0,0,0,1)";
+    if(bw>0){ ctx.lineWidth=2*bw*k; ctx.lineJoin="round";
+      ctx.strokeStyle="rgba(0,0,0,1)"; ctx.stroke(main); }
+    ctx.fill(main);
+    ctx.restore();
+  }
+  if(bw>0){                          // white border: dilate the outline outward
+    const b=bw*k;
+    ctx.save();
+    ctx.fillStyle=P.borderColor; ctx.strokeStyle=P.borderColor;
+    ctx.lineWidth=2*b; ctx.lineJoin="round"; ctx.lineCap="round";
+    ctx.fill(main); ctx.stroke(main);
+    ctx.restore();
+  }
+  if(P.grad){                        // linear gradient fill across the shape bbox
+    const a=P.gradAngle*Math.PI/180, S2=size;
+    const cx=S2/2, cy=S2/2, r=S2*0.62;
+    const gr=ctx.createLinearGradient(cx-Math.cos(a)*r, cy-Math.sin(a)*r,
+                                      cx+Math.cos(a)*r, cy+Math.sin(a)*r);
+    gr.addColorStop(0,P.main); gr.addColorStop(1,P.gradTo);
+    ctx.fillStyle=gr;
+  } else ctx.fillStyle=P.main;
+  ctx.fill(main);
+  if(P.twoTone){
+    ctx.save(); ctx.clip(main);
+    ctx.fillStyle=P.facet; ctx.fill(roundedPath(sp(g.wing), g.r*k));
+    ctx.restore();
+  }
+  if(P.shine && g.shine){
+    ctx.save(); ctx.clip(main);
+    const bar=new Path2D(); const b=sp(g.shine);
+    bar.moveTo(b[0][0],b[0][1]);
+    for(let i=1;i<b.length;i++) bar.lineTo(b[i][0],b[i][1]);
+    bar.closePath();
+    if(P.shineBlur>0) ctx.filter=`blur(${(P.shineBlur*k).toFixed(2)}px)`;
+    ctx.fillStyle=P.shineColor; ctx.fill(bar);
+    ctx.filter="none";
+    ctx.restore();
+  }
+  return g;
+}
+
+function paintBackdrop(ctx,size,bg){
+  if(bg==="light"){ctx.fillStyle="#ffffff";ctx.fillRect(0,0,size,size);}
+  else if(bg==="dark"){ctx.fillStyle="#26201f";ctx.fillRect(0,0,size,size);}
+  else{ const c=Math.max(10,Math.round(size/22)),
+    styles=getComputedStyle(document.documentElement),
+    a=styles.getPropertyValue("--chk-a").trim()||"#eee",
+    b=styles.getPropertyValue("--chk-b").trim()||"#ccc";
+    for(let y=0;y<size;y+=c)for(let x=0;x<size;x+=c){
+      ctx.fillStyle=((x/c+y/c)&1)?b:a; ctx.fillRect(x,y,c,c);} }
+}
+
+function drawRefLayer(ctx,px){
+  const im=ref.img; if(!im) return;
+  const base=px/Math.max(im.naturalWidth,im.naturalHeight);  // contain to full canvas at scale 1
+  const w=im.naturalWidth*base*ref.scale, h=im.naturalHeight*base*ref.scale;
+  const cx=ref.x*px/REF, cy=ref.y*px/REF;
+  ctx.save(); ctx.globalAlpha=ref.opacity;
+  ctx.imageSmoothingEnabled=true; ctx.imageSmoothingQuality="high";
+  ctx.drawImage(im, cx-w/2, cy-h/2, w, h);
+  ctx.restore();
+}
+
+// rounded Path2D through points (open polyline or closed polygon)
+function traceRoundedPath(pts, r, closed){
+  const path=new Path2D(), n=pts.length;
+  if(n<2) return path;
+  if(!closed){ path.moveTo(pts[0][0],pts[0][1]);
+    for(let i=1;i<n;i++) path.lineTo(pts[i][0],pts[i][1]); return path; }
+  for(let i=0;i<n;i++){
+    const p0=pts[(i-1+n)%n],p1=pts[i],p2=pts[(i+1)%n];
+    const v1=[p0[0]-p1[0],p0[1]-p1[1]],v2=[p2[0]-p1[0],p2[1]-p1[1]];
+    const l1=Math.hypot(...v1)||1,l2=Math.hypot(...v2)||1,rr=Math.min(r,l1/2,l2/2);
+    const pin=[p1[0]+v1[0]/l1*rr,p1[1]+v1[1]/l1*rr];
+    const pout=[p1[0]+v2[0]/l2*rr,p1[1]+v2[1]/l2*rr];
+    if(i===0) path.moveTo(pin[0],pin[1]); else path.lineTo(pin[0],pin[1]);
+    path.quadraticCurveTo(p1[0],p1[1],pout[0],pout[1]);
+  }
+  path.closePath(); return path;
+}
+function drawTrace(ctx,px,dpr){
+  const n=trace.pts.length; if(!n) return;
+  const k=px/REF, sp=trace.pts.map(p=>[p[0]*k,p[1]*k]), r=trace.smooth*k;
+  const closed=trace.closed && n>=3;
+  if(n>=2){
+    const path=traceRoundedPath(sp,r,closed);
+    if(closed){ ctx.save(); ctx.globalAlpha=0.5; ctx.fillStyle=S.main; ctx.fill(path); ctx.restore(); }
+    ctx.save(); ctx.strokeStyle=S.main; ctx.lineWidth=Math.max(1.5,dpr*1.4);
+    ctx.lineJoin="round"; ctx.stroke(path); ctx.restore();
+  }
+  sp.forEach((p,i)=>{
+    ctx.save();
+    ctx.beginPath(); ctx.arc(p[0],p[1],dpr*(i===trace.sel?6:4.5),0,7);
+    ctx.fillStyle="#fff"; ctx.fill();
+    ctx.lineWidth=dpr*(i===0?3:2); ctx.strokeStyle=i===0?"#111":S.main; ctx.stroke();
+    ctx.restore();
+    ctx.save(); ctx.fillStyle=S.main; ctx.textAlign="center"; ctx.textBaseline="middle";
+    ctx.font=`${Math.round(dpr*10)}px ui-sans-serif,system-ui,sans-serif`;
+    ctx.fillText(String(i+1), p[0], p[1]-dpr*11); ctx.restore();
+  });
+}
+function traceD(pts, r, closed){
+  const n=pts.length; if(n<2) return "";
+  const f=v=>v.toFixed(2);
+  if(!closed){ let s=`M${f(pts[0][0])},${f(pts[0][1])} `;
+    for(let i=1;i<n;i++) s+=`L${f(pts[i][0])},${f(pts[i][1])} `; return s.trim(); }
+  let s="";
+  for(let i=0;i<n;i++){
+    const p0=pts[(i-1+n)%n],p1=pts[i],p2=pts[(i+1)%n];
+    const v1=[p0[0]-p1[0],p0[1]-p1[1]],v2=[p2[0]-p1[0],p2[1]-p1[1]];
+    const l1=Math.hypot(...v1)||1,l2=Math.hypot(...v2)||1,rr=Math.min(r,l1/2,l2/2);
+    const pin=[p1[0]+v1[0]/l1*rr,p1[1]+v1[1]/l1*rr], pout=[p1[0]+v2[0]/l2*rr,p1[1]+v2[1]/l2*rr];
+    s+=(i===0?`M${f(pin[0])},${f(pin[1])} `:`L${f(pin[0])},${f(pin[1])} `);
+    s+=`Q${f(p1[0])},${f(p1[1])} ${f(pout[0])},${f(pout[1])} `;
+  }
+  return s+"Z";
+}
+function buildTraceSVG(){
+  const closed=trace.closed && trace.pts.length>=3;
+  const d=traceD(trace.pts, trace.smooth, closed);
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" shape-rendering="geometricPrecision">
+  <path d="${d}"${closed?` fill="${S.main}"`:` fill="none" stroke="${S.main}" stroke-width="2"`}/>
+</svg>`;
+}
+
+const $=id=>document.getElementById(id);
+const preview=$("preview"), pctx=preview.getContext("2d");
+
+function render(){
+  const dpr=Math.min(3,window.devicePixelRatio||1);
+  const cssSize=340, px=Math.round(cssSize*dpr);
+  if(preview.width!==px){preview.width=px;preview.height=px;}
+  preview.style.width=cssSize+"px";preview.style.height=cssSize+"px";
+  paintBackdrop(pctx,px,S.bg);
+  if(ref.img && !ref.over) drawRefLayer(pctx,px);
+  if(trace.on) pctx.globalAlpha=0.3;              // dim the dart while tracing
+  const g=drawDart(pctx,px,S,{outline:S.outline});
+  pctx.globalAlpha=1;
+  if(ref.img && ref.over) drawRefLayer(pctx,px);
+  if(!trace.on){                                  // hotspot marker (dart tip)
+    const hx=g.tip[0]*px/REF, hy=g.tip[1]*px/REF;
+    pctx.save();
+    pctx.strokeStyle="rgba(255,255,255,.9)";pctx.lineWidth=Math.max(1.5,dpr*1.3);
+    pctx.beginPath();pctx.arc(hx,hy,dpr*6,0,7);pctx.stroke();
+    pctx.strokeStyle="rgba(0,0,0,.55)";pctx.lineWidth=Math.max(1,dpr);
+    pctx.beginPath();pctx.arc(hx,hy,dpr*6,0,7);pctx.stroke();
+    pctx.restore();
+  }
+  drawTrace(pctx,px,dpr);
+  // actual sizes
+  for(const sz of [32,48]){
+    const cv=$("a"+sz), c=cv.getContext("2d"); c.clearRect(0,0,sz,sz);
+    drawDart(c,sz,S,{border:effBorder(sz)});
+  }
+  // hotspot readout (at export size)
+  const ge=geometry(S), es=S.exportSize;
+  $("hsOut").textContent=`${Math.round(ge.tip[0]*es/REF)}, ${Math.round(ge.tip[1]*es/REF)} @ ${es}px`;
+  updateRecipe();
+  scheduleCursor();
+}
+
+function updateRecipe(){
+  const facing=S.face==="right"?"up-right":"up-left";
+  const shapeLine = S.shape==="traced"
+    ? (S.tracedUniform
+        ? `shape:  <b>traced outline</b> · <b>matched corners</b> · radius <b>${S.tracedRadius}</b>`
+        : `shape:  <b>traced outline</b> · corner curve <b>${S.tracedRadius}</b> · ${S.tracedSimplify?"cleaned edges (13 pts)":"as traced (30 pts)"}`)
+    : `shape:  <b>len ${S.tip_len}</b> · <b>width ${S.back}</b> · back ${S.back_len} · notch ${S.notch} · tilt ${S.angle_deg}° · round ${S.radius}`;
+  $("recipe").innerHTML = shapeLine + `
+color:  main <b>${S.main.toUpperCase()}</b>${S.twoTone?` · facet <b>${S.facet.toUpperCase()}</b> (${S.wing})`:` · flat (no facet)`}
+facing: <b>${facing}</b> · hotspot at tip · border ${S.border?`<b>${S.border}</b> ${S.borderColor.toUpperCase()}`:"none"}` +
+    (S.grad ? `\ngrad:   <b>${S.main.toUpperCase()}</b> -> <b>${S.gradTo.toUpperCase()}</b> @ ${S.gradAngle}°` : ``) +
+    (S.shadow ? `\nshadow: blur ${S.shBlur} · dy ${S.shDy} · ${Math.round(S.shAlpha*100)}%` : `\nshadow: off`) +
+    (S.shine ? `\nshine:  <b>${S.shineColor.toUpperCase()}</b> · pos ${Math.round(S.shineT0*100)}% · len ${Math.round((S.shineT1-S.shineT0)*100)}% · thick ${S.shineWidth} · inset ${S.shineInset} · blur ${S.shineBlur}` : `\nshine:  off`);
+}
+
+/* ---------- export ---------- */
+function exportCanvas(size){
+  const ss=size<256?4:3, big=document.createElement("canvas");
+  big.width=size*ss; big.height=size*ss;
+  drawDart(big.getContext("2d"), size*ss, S);
+  const out=document.createElement("canvas"); out.width=size; out.height=size;
+  const oc=out.getContext("2d"); oc.imageSmoothingEnabled=true; oc.imageSmoothingQuality="high";
+  oc.drawImage(big,0,0,size,size);
+  return out;
+}
+function triggerDownload(blobOrUrl,name){
+  const url=typeof blobOrUrl==="string"?blobOrUrl:URL.createObjectURL(blobOrUrl);
+  const a=document.createElement("a"); a.href=url; a.download=name; a.rel="noopener";
+  document.body.appendChild(a); a.click(); a.remove();
+  if(typeof blobOrUrl!=="string") setTimeout(()=>URL.revokeObjectURL(url),4000);
+}
+function flashHint(msg,ok){const h=$("dlHint");h.textContent=msg;h.classList.toggle("ok",!!ok);
+  clearTimeout(flashHint._t);flashHint._t=setTimeout(()=>{h.classList.remove("ok");
+    h.textContent="Tip: if a download doesn’t start, right-click the preview → “Save image as”.";},4200);}
+
+$("dlPng").onclick=()=>{
+  const size=S.exportSize, cv=exportCanvas(size);
+  cv.toBlob(b=>{ if(b) triggerDownload(b,`arrow_cursor_${size}.png`);
+    flashHint(`Exported arrow_cursor_${size}.png`,true);}, "image/png");
+};
+function buildSVG(P){
+  const g=geometry(P);
+  const d=(pts)=>{ // rounded path 'd' string mirroring roundedPath
+    const n=pts.length; let s="";
+    for(let i=0;i<n;i++){
+      const p0=pts[(i-1+n)%n],p1=pts[i],p2=pts[(i+1)%n];
+      const v1=[p0[0]-p1[0],p0[1]-p1[1]],v2=[p2[0]-p1[0],p2[1]-p1[1]];
+      const l1=Math.hypot(...v1)||1,l2=Math.hypot(...v2)||1,rr=Math.min(g.r,l1/2,l2/2);
+      const pin=[p1[0]+v1[0]/l1*rr,p1[1]+v1[1]/l1*rr];
+      const pout=[p1[0]+v2[0]/l2*rr,p1[1]+v2[1]/l2*rr];
+      s+=(i===0?`M${pin[0].toFixed(2)},${pin[1].toFixed(2)} `:`L${pin[0].toFixed(2)},${pin[1].toFixed(2)} `);
+      s+=`Q${p1[0].toFixed(2)},${p1[1].toFixed(2)} ${pout[0].toFixed(2)},${pout[1].toFixed(2)} `;
+    } return s+"Z";
+  };
+  const md=d(g.poly), wd=d(g.wing);
+  const facet=P.twoTone?`\n  <path d="${wd}" fill="${P.facet}" clip-path="url(#c)"/>`:"";
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" shape-rendering="geometricPrecision">
+  <clipPath id="c"><path d="${md}"/></clipPath>
+  <path d="${md}" fill="${P.main}"/>${facet}
+</svg>`;
+}
+$("dlSvg").onclick=()=>{
+  const blob=new Blob([buildSVG(S)],{type:"image/svg+xml"});
+  triggerDownload(blob,"arrow_cursor.svg"); flashHint("Exported arrow_cursor.svg",true);
+};
+$("copyBtn").onclick=async()=>{
+  const txt=$("recipe").textContent;
+  try{ await navigator.clipboard.writeText(txt); $("copyBtn").textContent="Copied ✓";
+    setTimeout(()=>$("copyBtn").textContent="Copy recipe",1600);}
+  catch(e){ const r=document.createRange();r.selectNodeContents($("recipe"));
+    const sel=getSelection();sel.removeAllRanges();sel.addRange(r);
+    $("copyBtn").textContent="Selected — ⌘/Ctrl+C"; setTimeout(()=>$("copyBtn").textContent="Copy recipe",2200);}
+};
+
+/* ---------- wiring ---------- */
+function bindRange(id,key,out,fmt){ const el=$(id);
+  el.oninput=()=>{S[key]=+el.value; $(out).textContent=fmt?fmt(el.value):el.value; render();}; }
+bindRange("tilt","angle_deg","oTilt",v=>v+"°");
+bindRange("len","tip_len","oLen");
+bindRange("wid","back","oWid");
+bindRange("notch","notch","oNotch");
+bindRange("rad","radius","oRad");
+
+function hexOK(v){return /^#?[0-9a-fA-F]{6}$/.test(v.trim());}
+function norm(v){v=v.trim();return v[0]==="#"?v:"#"+v;}
+function bindColor(picker,hex,key){
+  const p=$(picker),h=$(hex);
+  p.oninput=()=>{S[key]=p.value; h.value=p.value.toUpperCase(); render();};
+  h.oninput=()=>{ if(hexOK(h.value)){const n=norm(h.value);S[key]=n;p.value=n;render();} };
+}
+bindColor("mainColor","mainHex","main");
+bindColor("facetColor","facetHex","facet");
+
+function setPressed(groupId,attr,val){
+  document.querySelectorAll(`#${groupId} button`).forEach(b=>
+    b.setAttribute("aria-pressed", b.dataset[attr]===val ? "true":"false"));
+}
+$("facing").onclick=e=>{const b=e.target.closest("button");if(!b)return;
+  S.face=b.dataset.face; setPressed("facing","face",S.face); render();};
+$("wing").onclick=e=>{const b=e.target.closest("button");if(!b)return;
+  S.wing=b.dataset.wing; setPressed("wing","wing",S.wing); render();};
+
+const facetRow=$("facetRow"), wingRow=$("wingRow");
+function twoToneUI(){ facetRow.classList.toggle("disabled",!S.twoTone);
+  wingRow.style.display=S.twoTone?"":"none"; }
+$("twoTone").onclick=()=>{S.twoTone=!S.twoTone;
+  $("twoTone").setAttribute("aria-checked",S.twoTone); twoToneUI(); render();};
+
+document.querySelectorAll(".swatches .sw").forEach(sw=>sw.onclick=()=>{
+  S.bg=sw.dataset.bg;
+  document.querySelectorAll(".swatches .sw").forEach(o=>o.setAttribute("aria-pressed",o===sw));
+  render();});
+
+$("size").onchange=e=>{S.exportSize=+e.target.value; render();};
+
+/* ---------- reference layer ---------- */
+function loadRef(url){
+  const im=new Image();
+  im.onload=()=>{ ref.img=im; ref.x=128; ref.y=128; ref.scale=1;
+    $("rscale").value=100; $("oScale").textContent="100%";
+    $("refControls").classList.remove("refoff");
+    $("refEmpty").classList.add("refempty-hide");
+    preview.classList.add("grab"); render(); };
+  im.onerror=()=>{ $("refEmpty").classList.remove("refempty-hide");
+    $("refEmpty").textContent="Couldn’t load that image — try a PNG or JPG."; };
+  im.src=url;
+}
+$("refUpload").onclick=()=>$("refFile").click();
+$("refFile").onchange=e=>{ const f=e.target.files&&e.target.files[0]; if(!f) return;
+  const rd=new FileReader(); rd.onload=()=>loadRef(rd.result); rd.readAsDataURL(f); e.target.value=""; };
+$("refOrig").onclick=()=>loadRef(REF_ORIG);
+$("refHD").onclick=()=>loadRef(REF_HD);
+$("refClear").onclick=()=>{ ref.img=null; $("refControls").classList.add("refoff");
+  $("refEmpty").classList.remove("refempty-hide"); preview.classList.remove("grab"); render(); };
+$("refFit").onclick=()=>{ ref.x=128; ref.y=128; ref.scale=1;
+  $("rscale").value=100; $("oScale").textContent="100%"; render(); };
+$("opac").oninput=e=>{ ref.opacity=+e.target.value/100; $("oOpac").textContent=e.target.value+"%"; render(); };
+$("rscale").oninput=e=>{ ref.scale=+e.target.value/100; $("oScale").textContent=e.target.value+"%"; render(); };
+$("reforder").onclick=e=>{ const b=e.target.closest("button"); if(!b) return;
+  ref.over=b.dataset.over==="true";
+  document.querySelectorAll("#reforder button").forEach(x=>x.setAttribute("aria-pressed", x===b));
+  render(); };
+$("outline").onclick=()=>{ S.outline=!S.outline;
+  $("outline").setAttribute("aria-checked",S.outline); render(); };
+
+// pointer on the preview: plot/drag trace points (plot mode) or move the reference
+let dragging=false, last=null, ptDrag=-1;
+function toRef(e){ const r=preview.getBoundingClientRect();
+  return [ (e.clientX-r.left)/r.width*REF, (e.clientY-r.top)/r.height*REF ]; }
+function hitPoint(rx,ry){ let best=-1,bd=9;               // grab radius in REF units
+  trace.pts.forEach((p,i)=>{ const d=Math.hypot(p[0]-rx,p[1]-ry); if(d<bd){bd=d;best=i;} });
+  return best; }
+const snap=p=>[+p[0].toFixed(1),+p[1].toFixed(1)];
+preview.addEventListener("pointerdown",e=>{
+  const p=toRef(e);
+  if(trace.on){
+    const hit=hitPoint(p[0],p[1]);
+    if(hit>=0){ ptDrag=hit; trace.sel=hit; }
+    else { trace.pts.push(snap(p)); ptDrag=trace.pts.length-1; trace.sel=ptDrag; }
+    try{preview.setPointerCapture(e.pointerId);}catch(_){}
+    updateTraceUI(); render(); return;
+  }
+  if(!ref.img) return;
+  dragging=true; last=p; preview.classList.add("grabbing");
+  try{preview.setPointerCapture(e.pointerId);}catch(_){}
+});
+preview.addEventListener("pointermove",e=>{
+  const p=toRef(e);
+  if(ptDrag>=0){ trace.pts[ptDrag]=snap(p); updateTraceUI(); render(); return; }
+  if(!dragging) return;
+  ref.x+=p[0]-last[0]; ref.y+=p[1]-last[1]; last=p; render();
+});
+function endDrag(e){ dragging=false; ptDrag=-1; preview.classList.remove("grabbing");
+  try{preview.releasePointerCapture(e.pointerId);}catch(_){} }
+preview.addEventListener("pointerup",endDrag);
+preview.addEventListener("pointercancel",endDrag);
+
+/* ---------- depth: shadow + gradient ---------- */
+function depthUI(){
+  $("shadowCtl").style.display = S.shadow ? "" : "none";
+  $("gradCtl").style.display   = S.grad ? "" : "none";
+}
+$("shadowOn").onclick=()=>{ S.shadow=!S.shadow;
+  $("shadowOn").setAttribute("aria-checked",S.shadow); depthUI(); render(); };
+$("gradOn").onclick=()=>{ S.grad=!S.grad;
+  $("gradOn").setAttribute("aria-checked",S.grad); depthUI(); render(); };
+$("shBlur").oninput=e=>{ S.shBlur=+e.target.value; $("oShBlur").textContent=e.target.value; render(); };
+$("shDy").oninput=e=>{ S.shDy=+e.target.value; $("oShDy").textContent=e.target.value; render(); };
+$("shAlpha").oninput=e=>{ S.shAlpha=+e.target.value/100; $("oShA").textContent=e.target.value+"%"; render(); };
+$("gradAngle").oninput=e=>{ S.gradAngle=+e.target.value; $("oGrA").textContent=e.target.value+"°"; render(); };
+bindColor("gradTo","gradToHex","gradTo");
+
+/* ---------- border ---------- */
+$("bord").oninput=e=>{ S.border=+e.target.value; $("oBord").textContent=e.target.value; render(); };
+bindColor("bordColor","bordHex","borderColor");
+
+/* ---------- shine ---------- */
+function shineUI(){ $("shineCtl").style.display = S.shine ? "" : "none"; }
+$("shineOn").onclick=()=>{ S.shine=!S.shine;
+  $("shineOn").setAttribute("aria-checked",S.shine); shineUI(); render(); };
+bindColor("shineColor","shineHex","shineColor");
+function shineFromUI(){
+  const pos=+$("shPos").value/100, len=+$("shLen").value/100;
+  S.shineT0=pos; S.shineT1=pos+len;
+  S.shineWidth=+$("shW").value; S.shineInset=+$("shIn").value;
+  $("oShPos").textContent=$("shPos").value+"%";
+  $("oShLen").textContent=$("shLen").value+"%";
+  $("oShW").textContent=$("shW").value;
+  $("oShIn").textContent=$("shIn").value;
+  render();
+}
+$("shBl").oninput=e=>{ S.shineBlur=+e.target.value; $("oShBl").textContent=e.target.value; render(); };
+["shPos","shLen","shW","shIn"].forEach(id=>$(id).oninput=shineFromUI);
+
+/* ---------- shape source: traced vs parametric ---------- */
+function shapeUI(){
+  const traced = S.shape==="traced";
+  $("tracedShape").style.display = traced ? "" : "none";
+  $("dartShape").style.display   = traced ? "none" : "";
+}
+$("shapeSrc").onclick=e=>{ const b=e.target.closest("button"); if(!b) return;
+  S.shape=b.dataset.shape;
+  document.querySelectorAll("#shapeSrc button").forEach(x=>x.setAttribute("aria-pressed",x===b));
+  shapeUI(); render(); };
+$("tRad").oninput=e=>{ S.tracedRadius=+e.target.value; $("oTRad").textContent=e.target.value; render(); };
+$("tSimp").onclick=()=>{ S.tracedSimplify=!S.tracedSimplify;
+  $("tSimp").setAttribute("aria-checked",S.tracedSimplify); render(); };
+function uniUI(){
+  $("simpRow").style.display = S.tracedUniform ? "none" : "";
+  $("uniHint").style.display = S.tracedUniform ? "" : "none";
+}
+$("tUni").onclick=()=>{ S.tracedUniform=!S.tracedUniform;
+  $("tUni").setAttribute("aria-checked",S.tracedUniform); uniUI(); render(); };
+// load the traced outline into plot mode so the points can be edited by hand
+$("toPlot").onclick=()=>{
+  trace.pts = (S.tracedSimplify?simplifyPts(TRACED):TRACED).map(p=>[+p[0].toFixed(1),+p[1].toFixed(1)]);
+  trace.closed=true; trace.smooth=S.tracedRadius;
+  $("tSmooth").value=S.tracedRadius; $("oSmooth").textContent=S.tracedRadius;
+  if(!trace.on){ trace.on=true; $("plot").setAttribute("aria-checked",true);
+    $("traceControls").classList.remove("isoff"); preview.classList.add("plot"); }
+  updateTraceUI(); render();
+  $("toPlot").textContent="Loaded ✓ — see Trace points";
+  setTimeout(()=>$("toPlot").textContent="Edit points in plot mode",2200);
+};
+
+/* ---------- trace points ---------- */
+function updateTraceUI(){
+  const n=trace.pts.length, el=$("tCoords");
+  if(!n){ el.textContent="no points yet — click on the preview"; return; }
+  el.innerHTML = trace.pts.map((p,i)=>
+    `${String(i+1).padStart(2," ")}:  <b>${p[0]}, ${p[1]}</b>${i===0?"   ← hotspot":""}`).join("\n")
+    + `\n\ncoordinates in a 256×256 viewBox`;
+}
+function flashBtn(id,msg,base){ const b=$(id); b.textContent=msg; setTimeout(()=>b.textContent=base,1500); }
+async function copyText(txt,id,base){ try{ await navigator.clipboard.writeText(txt);
+  flashBtn(id,"Copied ✓",base);}catch(_){ flashBtn(id,"Press ⌘/Ctrl+C",base); } }
+$("plot").onclick=()=>{ trace.on=!trace.on; $("plot").setAttribute("aria-checked",trace.on);
+  $("traceControls").classList.toggle("isoff",!trace.on);
+  preview.classList.toggle("plot",trace.on); render(); };
+$("tUndo").onclick=()=>{ trace.pts.pop(); trace.sel=-1; updateTraceUI(); render(); };
+$("tClear").onclick=()=>{ trace.pts=[]; trace.sel=-1; updateTraceUI(); render(); };
+$("tClosed").onclick=()=>{ trace.closed=!trace.closed;
+  $("tClosed").setAttribute("aria-checked",trace.closed); render(); };
+$("tSmooth").oninput=e=>{ trace.smooth=+e.target.value; $("oSmooth").textContent=e.target.value; render(); };
+$("tCopyPts").onclick=()=>copyText("["+trace.pts.map(p=>`[${p[0]},${p[1]}]`).join(",")+"]","tCopyPts","Copy points");
+$("tCopySvg").onclick=()=>copyText(buildTraceSVG(),"tCopySvg","Copy SVG");
+$("tDlSvg").onclick=()=>{ if(trace.pts.length<3){ flashBtn("tDlSvg","Need ≥3 points","Download traced SVG"); return; }
+  triggerDownload(new Blob([buildTraceSVG()],{type:"image/svg+xml"}),"traced_cursor.svg");
+  flashBtn("tDlSvg","Downloaded ✓","Download traced SVG"); };
+
+/* ---------- playground: use the design as the real pointer ---------- */
+// Below ~24px a border of 8 units lands under one device pixel and vanishes into
+// a pale haze, so thicken it just enough to keep a solid pixel of white.
+const MIN_BORDER_PX=1.3;
+function effBorder(px){ return Math.max(S.border, S.border>0 ? MIN_BORDER_PX*REF/px : 0); }
+function cursorDataURL(size){
+  const ss=4, big=document.createElement("canvas");
+  big.width=size*ss; big.height=size*ss;
+  drawDart(big.getContext("2d"), size*ss, S, {border:effBorder(size)});
+  const out=document.createElement("canvas"); out.width=size; out.height=size;
+  const oc=out.getContext("2d");
+  oc.imageSmoothingEnabled=true; oc.imageSmoothingQuality="high";
+  oc.drawImage(big,0,0,size,size);
+  return out.toDataURL("image/png");
+}
+let cursorCSS="";
+function applyCursor(){
+  const size=+$("playSize").value;
+  const g=geometry(S);
+  // hotspot is in CSS px (relative to the 1x size) and must land inside the image
+  const hx=Math.max(0,Math.min(size-1, Math.round(g.tip[0]*size/REF)));
+  const hy=Math.max(0,Math.min(size-1, Math.round(g.tip[1]*size/REF)));
+  // On a HiDPI screen a 1x image gets scaled up by the OS and looks pixelated.
+  // image-set() lets us hand the browser a real 2x asset shown at the same
+  // logical size. Cap the physical image at 128px — browsers refuse larger.
+  const dpr=Math.min(window.devicePixelRatio||1, 128/size);
+  const url1=cursorDataURL(size);
+  const plain=`url("${url1}") ${hx} ${hy}, auto`;      // fallback (quoted: data URLs have commas)
+  const el=$("play");
+  const set=(node,val2x)=>{ node.style.cursor=plain; if(val2x) node.style.cursor=val2x; };
+  let hi=null;
+  if(dpr>1.01){
+    const url2=cursorDataURL(Math.round(size*dpr));
+    hi=`image-set(url("${url1}") 1x, url("${url2}") ${dpr}x) ${hx} ${hy}, auto`;
+  }
+  set(el,hi);
+  cursorCSS = el.style.cursor || plain;                 // whatever actually stuck
+  if($("playAll").getAttribute("aria-checked")==="true") set(document.body,hi);
+  else document.body.style.cursor="";
+  const phys=Math.round(size*dpr);
+  const eb=effBorder(size);
+  $("playNote").textContent =
+    (eb>S.border+0.01 ? `Border auto-thickened to keep a solid pixel of white at this size. ` : ``)+
+    `Shown at ${size}px with the hotspot at ${hx},${hy}`+
+    (dpr>1.01 ? `, drawn at ${phys}px for this ${window.devicePixelRatio}× display so it stays sharp. ` : `. `)+
+    `Browsers cap custom cursors (often 32px, 128px max) — if a larger size stops `+
+    `showing, that ceiling is why.`;
+}
+let cursorPending=0;
+function scheduleCursor(){                 // keep slider dragging smooth
+  if(cursorPending) return;
+  cursorPending=requestAnimationFrame(()=>{ cursorPending=0; applyCursor(); });
+}
+$("playSize").onchange=applyCursor;
+$("playAll").onclick=()=>{
+  const on=$("playAll").getAttribute("aria-checked")!=="true";
+  $("playAll").setAttribute("aria-checked",on);
+  document.body.style.cursor = on ? cursorCSS : "";
+};
+
+// re-tint actual-size chips per backdrop for the mini previews' legibility
+new MutationObserver(render).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+twoToneUI(); shapeUI(); uniUI(); shineUI(); depthUI(); updateTraceUI(); render();
+window.addEventListener("resize",()=>render());
+</script>
+</body>
+</html>
