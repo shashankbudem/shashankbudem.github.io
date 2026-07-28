@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Arrow Cursor Designer | Budem Shashank</title>
+    <meta
+      name="description"
+      content="A browser tool for designing a custom mouse cursor: trace a shape, match the corner curves, then export PNG, SVG and a multi-resolution .cur file."
+    />
+    <meta name="author" content="Budem Shashank" />
+    <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
+    <meta name="theme-color" content="#080c0f" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="canonical" href="https://shashankbudem.github.io/cursor-designer/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_IN" />
+    <meta property="og:site_name" content="Budem Shashank Portfolio" />
+    <meta property="og:title" content="Arrow Cursor Designer | Budem Shashank" />
+    <meta property="og:description" content="Design a custom mouse cursor in the browser, then export PNG, SVG and a multi-resolution .cur file." />
+    <meta property="og:url" content="https://shashankbudem.github.io/cursor-designer/" />
+    <meta property="og:image" content="https://shashankbudem.github.io/assets/cursor/arrow-cursor-512.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:alt" content="A red arrow cursor with a white keyline" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Arrow Cursor Designer | Budem Shashank" />
+    <meta name="twitter:description" content="Design a custom mouse cursor in the browser, then export PNG, SVG and a multi-resolution .cur file." />
+    <meta name="twitter:image" content="https://shashankbudem.github.io/assets/cursor/arrow-cursor-512.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../styles.css" />
+    <style>
+      /* The tool ships as one self-contained document with its own design system,
+         so it runs in a frame — that keeps its CSS from colliding with the site's. */
+      .tool-frame {
+        width: 100%;
+        height: clamp(640px, calc(100vh - 190px), 1500px);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        background: var(--panel-strong);
+        box-shadow: var(--shadow);
+        display: block;
+      }
+      .tool-note {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px 22px;
+        align-items: center;
+        margin: 14px 0 0;
+        color: var(--muted);
+        font-size: 0.82rem;
+      }
+      .tool-note a {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--cyan);
+        font-weight: 800;
+      }
+    </style>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "@id": "https://shashankbudem.github.io/cursor-designer/#app",
+        "url": "https://shashankbudem.github.io/cursor-designer/",
+        "name": "Arrow Cursor Designer",
+        "applicationCategory": "DesignApplication",
+        "operatingSystem": "Any",
+        "description": "A browser tool for designing a custom mouse cursor and exporting PNG, SVG and multi-resolution .cur files.",
+        "isPartOf": { "@id": "https://shashankbudem.github.io/#website" },
+        "author": { "@id": "https://shashankbudem.github.io/#person" },
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "inLanguage": "en-IN"
+      }
+    </script>
+  </head>
+  <body>
+    <header class="site-header is-scrolled" data-header>
+      <a class="brand" href="../index.html" aria-label="Budem Shashank home">
+        <span class="brand-mark">SB</span>
+        <span>Budem Shashank</span>
+      </a>
+      <button class="nav-toggle" type="button" aria-label="Open navigation" aria-expanded="false" data-nav-toggle>
+        <i data-lucide="menu"></i>
+      </button>
+      <nav class="site-nav" data-nav>
+        <a href="../index.html">Home</a>
+        <a class="is-active" href="../projects/">Projects</a>
+        <a href="../experience/">Experience</a>
+        <a href="../resume/">Resume</a>
+        <a href="../contact/">Contact</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="page-hero">
+        <div class="section-inner page-hero-grid">
+          <div>
+            <p class="eyebrow">Interface Craft / Tooling</p>
+            <h1>A cursor, and the tool built to design it.</h1>
+          </div>
+          <p>
+            Shape it live, trace over a reference, then export PNG, SVG, or a multi-resolution
+            <code>.cur</code>. The playground at the bottom turns your own pointer into the design.
+          </p>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-inner">
+          <iframe
+            class="tool-frame"
+            src="./app.html"
+            title="Arrow Cursor Designer"
+            loading="lazy"
+          ></iframe>
+          <p class="tool-note">
+            <span>Best on a desktop browser with a mouse.</span>
+            <a href="../assets/cursor/arrow-cursor.cur" download>
+              <span>Download the .cur</span>
+              <i data-lucide="download"></i>
+            </a>
+            <a href="https://github.com/shashankbudem/arrow-cursor-designer">
+              <span>Source on GitHub</span>
+              <i data-lucide="arrow-up-right"></i>
+            </a>
+          </p>
+        </div>
+      </section>
+
+      <section class="section-band">
+        <div class="section-inner">
+          <div class="section-heading">
+            <p class="section-kicker">Notes</p>
+            <h2>Three problems that shaped the code.</h2>
+          </div>
+          <div class="project-grid compact-grid">
+            <article class="project-card">
+              <h3>Corners that wouldn't match</h3>
+              <p>
+                Rounding the traced points gave the nose a tighter curve than the two tails. Each
+                corner is a cluster of clicked points, so the radius kept getting clamped by the
+                short gaps between them. Rebuilding true corners from the long edges, then applying
+                constant-radius tangent arcs, made every corner identical.
+              </p>
+            </article>
+            <article class="project-card">
+              <h3>A kink in the keyline</h3>
+              <p>
+                Drawing the white border as one thick stroke self-intersects at the concave notch
+                and leaves a visible dent. Replacing it with a proper outward dilation — a band
+                along each edge plus a disc at each vertex — cleared it.
+              </p>
+            </article>
+            <article class="project-card">
+              <h3>A border that vanished when small</h3>
+              <p>
+                At 16px the border worked out to half a device pixel and rendered as a pale haze
+                rather than white. Small frames now thicken it just enough to hold one solid pixel,
+                which is what keeps the cursor readable against any background.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; <span data-year></span> Budem Shashank. Built for the internet.</p>
+      <a href="#" aria-label="Back to top">
+        <i data-lucide="arrow-up"></i>
+      </a>
+    </footer>
+
+    <!-- cursor.js is deliberately omitted: the site-wide reticle would fight the
+         tool's own cursor playground. -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <script src="../script.js"></script>
+  </body>
+</html>
