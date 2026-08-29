@@ -1,3 +1,15 @@
+// GitHub Pages can't redirect server-side, so /index.html sticks in the address
+// bar for anyone arriving from an old bookmark, autocomplete, or a stale search
+// result. Rewrite it to the directory form in place — no reload, no extra
+// request. Query string and hash are preserved.
+if (location.pathname.endsWith("/index.html")) {
+  history.replaceState(
+    null,
+    "",
+    location.pathname.slice(0, -"index.html".length) + location.search + location.hash
+  );
+}
+
 const header = document.querySelector("[data-header]");
 const nav = document.querySelector("[data-nav]");
 const navToggle = document.querySelector("[data-nav-toggle]");
